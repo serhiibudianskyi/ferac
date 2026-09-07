@@ -130,10 +130,14 @@ func (am AppModule) ExportGenesis(ctx sdk.Context, _ codec.JSONCodec) json.RawMe
 // To avoid wrong/empty versions, the initial version should be set to 1.
 func (AppModule) ConsensusVersion() uint64 { return 1 }
 
-// BeginBlock contains the logic that is automatically triggered at the beginning of each block.
-// The begin block implementation is optional.
-func (am AppModule) BeginBlock(_ context.Context) error {
-	return nil
+// BeginBlock records validator uptime and releases the yearly slice of the
+// validator reserve when a reserve epoch has elapsed.
+func (am AppModule) BeginBlock(ctx context.Context) error {
+	if err := am.keeper.TrackUptime(ctx); err != nil {
+		return err
+	}
+
+	return am.keeper.MaybeReleaseReserve(ctx)
 }
 
 // EndBlock contains the logic that is automatically triggered at the end of each block.

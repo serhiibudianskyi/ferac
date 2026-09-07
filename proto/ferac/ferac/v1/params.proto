@@ -2,12 +2,138 @@ syntax = "proto3";
 package ferac.ferac.v1;
 
 import "amino/amino.proto";
+import "cosmos_proto/cosmos.proto";
 import "gogoproto/gogo.proto";
 
 option go_package = "github.com/serhiibudianskyi/ferac/x/ferac/types";
 
-// Params defines the parameters for the module.
+// Params defines the FERAC tokenomics and consensus policy parameters.
 message Params {
   option (amino.name) = "ferac/x/ferac/Params";
   option (gogoproto.equal) = true;
+
+  // denom is the base (smallest) denomination of FERAC.
+  string denom = 1;
+
+  // max_supply is the immutable hard cap expressed in the base denom.
+  // 88,888,888 FERAC with 6 decimals = 88888888000000 uferac.
+  string max_supply = 2 [
+    (cosmos_proto.scalar) = "cosmos.Int",
+    (gogoproto.customtype) = "cosmossdk.io/math.Int",
+    (gogoproto.nullable) = false
+  ];
+
+  // restricted_release_rate is the share of the *remaining* balance that a
+  // creator/team account may move within one restriction period (0.25).
+  string restricted_release_rate = 3 [
+    (cosmos_proto.scalar) = "cosmos.Dec",
+    (gogoproto.customtype) = "cosmossdk.io/math.LegacyDec",
+    (gogoproto.nullable) = false
+  ];
+
+  // restricted_period_seconds is the length of one creator/team period (12 months).
+  int64 restricted_period_seconds = 4;
+
+  // reserve_release_rate is the share of the *remaining* validator reserve
+  // released for rewards each reserve period (0.05).
+  string reserve_release_rate = 5 [
+    (cosmos_proto.scalar) = "cosmos.Dec",
+    (gogoproto.customtype) = "cosmossdk.io/math.LegacyDec",
+    (gogoproto.nullable) = false
+  ];
+
+  // reserve_period_seconds is the length of one validator reserve period (12 months).
+  int64 reserve_period_seconds = 6;
+
+  // stake_weight is the weight of bonded stake in the reward formula (0.40).
+  string stake_weight = 7 [
+    (cosmos_proto.scalar) = "cosmos.Dec",
+    (gogoproto.customtype) = "cosmossdk.io/math.LegacyDec",
+    (gogoproto.nullable) = false
+  ];
+
+  // uptime_weight is the weight of uptime in the reward formula (0.40).
+  string uptime_weight = 8 [
+    (cosmos_proto.scalar) = "cosmos.Dec",
+    (gogoproto.customtype) = "cosmossdk.io/math.LegacyDec",
+    (gogoproto.nullable) = false
+  ];
+
+  // quality_weight is the weight of the quality score in the reward formula (0.20).
+  string quality_weight = 9 [
+    (cosmos_proto.scalar) = "cosmos.Dec",
+    (gogoproto.customtype) = "cosmossdk.io/math.LegacyDec",
+    (gogoproto.nullable) = false
+  ];
+
+  // network_fee_rate is the protocol fee taken from a transfer (0.0001 = 0.01%).
+  string network_fee_rate = 10 [
+    (cosmos_proto.scalar) = "cosmos.Dec",
+    (gogoproto.customtype) = "cosmossdk.io/math.LegacyDec",
+    (gogoproto.nullable) = false
+  ];
+
+  // network_fee_validator_share is the part of the network fee routed to
+  // validators; the remainder goes to the treasury (0.5 => 0.005% / 0.005%).
+  string network_fee_validator_share = 11 [
+    (cosmos_proto.scalar) = "cosmos.Dec",
+    (gogoproto.customtype) = "cosmossdk.io/math.LegacyDec",
+    (gogoproto.nullable) = false
+  ];
+
+  // dex_fee_rate is the DEX swap fee routed entirely to the treasury (0.0002 = 0.02%).
+  string dex_fee_rate = 12 [
+    (cosmos_proto.scalar) = "cosmos.Dec",
+    (gogoproto.customtype) = "cosmossdk.io/math.LegacyDec",
+    (gogoproto.nullable) = false
+  ];
+
+  // max_validator_stake_share caps the share of total bonded stake a single
+  // validator may hold, limiting stake concentration.
+  string max_validator_stake_share = 13 [
+    (cosmos_proto.scalar) = "cosmos.Dec",
+    (gogoproto.customtype) = "cosmossdk.io/math.LegacyDec",
+    (gogoproto.nullable) = false
+  ];
+
+  // min_self_delegation is the minimum self-bonded amount required to run a
+  // validator. It raises the cost of Sybil validator creation.
+  string min_self_delegation = 14 [
+    (cosmos_proto.scalar) = "cosmos.Int",
+    (gogoproto.customtype) = "cosmossdk.io/math.Int",
+    (gogoproto.nullable) = false
+  ];
+
+  // validator_unbonding_seconds is the mandatory exit notice for a validator
+  // self-undelegation (14 days). Delegators use the staking unbonding time.
+  int64 validator_unbonding_seconds = 15;
+
+  // genesis_validator_count is the number of independent genesis validators (4).
+  uint32 genesis_validator_count = 16;
+
+  // genesis_finality_threshold is the number of genesis validators required to
+  // finalize a block while the set is still at genesis size (3 of 4).
+  uint32 genesis_finality_threshold = 17;
+
+  // supermajority_threshold is the voting power fraction required once the
+  // validator set grows beyond the genesis size (~2/3+).
+  string supermajority_threshold = 18 [
+    (cosmos_proto.scalar) = "cosmos.Dec",
+    (gogoproto.customtype) = "cosmossdk.io/math.LegacyDec",
+    (gogoproto.nullable) = false
+  ];
+
+  // validator_commission_rate is the fixed validator commission (0.05).
+  string validator_commission_rate = 19 [
+    (cosmos_proto.scalar) = "cosmos.Dec",
+    (gogoproto.customtype) = "cosmossdk.io/math.LegacyDec",
+    (gogoproto.nullable) = false
+  ];
+
+  // treasury_address receives the treasury part of network and DEX fees.
+  string treasury_address = 20 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+
+  // max_validators_per_operator limits how many validators a single funding
+  // identity may operate, mitigating Sybil validator farms.
+  uint32 max_validators_per_operator = 21;
 }

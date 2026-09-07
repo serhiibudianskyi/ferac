@@ -83,6 +83,7 @@ var (
 		{Account: nft.ModuleName},
 		{Account: ibctransfertypes.ModuleName, Permissions: []string{authtypes.Minter, authtypes.Burner}},
 		{Account: icatypes.ModuleName},
+		{Account: feracmoduletypes.ReserveName},
 	}
 
 	// blocked account addresses
@@ -93,6 +94,7 @@ var (
 		stakingtypes.BondedPoolName,
 		stakingtypes.NotBondedPoolName,
 		nft.ModuleName,
+		feracmoduletypes.ReserveName,
 		// We allow the following module accounts to receive funds:
 		// govtypes.ModuleName
 	}
@@ -151,6 +153,10 @@ var (
 						slashingtypes.ModuleName,
 						govtypes.ModuleName,
 						minttypes.ModuleName,
+						// The ferac module must be initialized before genutil so
+						// that its params are available to the ante handler when
+						// the genesis transactions are delivered.
+						feracmoduletypes.ModuleName,
 						genutiltypes.ModuleName,
 						evidencetypes.ModuleName,
 						authz.ModuleName,
@@ -164,9 +170,7 @@ var (
 						// ibc modules
 						ibcexported.ModuleName,
 						ibctransfertypes.ModuleName,
-						icatypes.ModuleName,
-						// chain modules
-						feracmoduletypes.ModuleName},
+						icatypes.ModuleName},
 				}),
 			},
 			{

@@ -19,6 +19,9 @@ func TestMsgUpdateParams(t *testing.T) {
 	authorityStr, err := f.addressCodec.BytesToString(f.keeper.GetAuthority())
 	require.NoError(t, err)
 
+	raisedSupply := types.DefaultParams()
+	raisedSupply.MaxSupply = types.MaxSupply.AddRaw(1)
+
 	// default params
 	testCases := []struct {
 		name      string
@@ -36,12 +39,22 @@ func TestMsgUpdateParams(t *testing.T) {
 			expErrMsg: "invalid authority",
 		},
 		{
-			name: "send enabled param",
+			name: "empty params",
 			input: &types.MsgUpdateParams{
 				Authority: authorityStr,
 				Params:    types.Params{},
 			},
-			expErr: false,
+			expErr:    true,
+			expErrMsg: "denom cannot be empty",
+		},
+		{
+			name: "max supply cannot be raised",
+			input: &types.MsgUpdateParams{
+				Authority: authorityStr,
+				Params:    raisedSupply,
+			},
+			expErr:    true,
+			expErrMsg: "max supply is immutable",
 		},
 		{
 			name: "all good",

@@ -3,7 +3,9 @@ package ferac.ferac.v1;
 
 import "amino/amino.proto";
 import "cosmos/base/query/v1beta1/pagination.proto";
+import "cosmos_proto/cosmos.proto";
 import "ferac/ferac/v1/params.proto";
+import "ferac/ferac/v1/tokenomics.proto";
 import "gogoproto/gogo.proto";
 import "google/api/annotations.proto";
 
@@ -15,6 +17,26 @@ service Query {
   rpc Params(QueryParamsRequest) returns (QueryParamsResponse) {
     option (google.api.http).get = "/serhiibudianskyi/ferac/ferac/v1/params";
   }
+
+  // ValidatorReserve queries the remaining validator reserve and epoch state.
+  rpc ValidatorReserve(QueryValidatorReserveRequest) returns (QueryValidatorReserveResponse) {
+    option (google.api.http).get = "/serhiibudianskyi/ferac/ferac/v1/validator_reserve";
+  }
+
+  // RestrictedAccount queries the creator/team transfer limit state of an account.
+  rpc RestrictedAccount(QueryRestrictedAccountRequest) returns (QueryRestrictedAccountResponse) {
+    option (google.api.http).get = "/serhiibudianskyi/ferac/ferac/v1/restricted_accounts/{address}";
+  }
+
+  // RestrictedAccounts lists all restricted accounts.
+  rpc RestrictedAccounts(QueryRestrictedAccountsRequest) returns (QueryRestrictedAccountsResponse) {
+    option (google.api.http).get = "/serhiibudianskyi/ferac/ferac/v1/restricted_accounts";
+  }
+
+  // ValidatorPerformance queries the uptime/quality counters of a validator.
+  rpc ValidatorPerformance(QueryValidatorPerformanceRequest) returns (QueryValidatorPerformanceResponse) {
+    option (google.api.http).get = "/serhiibudianskyi/ferac/ferac/v1/performances/{validator_address}";
+  }
 }
 
 // QueryParamsRequest is request type for the Query/Params RPC method.
@@ -24,6 +46,72 @@ message QueryParamsRequest {}
 message QueryParamsResponse {
   // params holds all the parameters of this module.
   Params params = 1 [
+    (gogoproto.nullable) = false,
+    (amino.dont_omitempty) = true
+  ];
+}
+
+// QueryValidatorReserveRequest is the request type for Query/ValidatorReserve.
+message QueryValidatorReserveRequest {}
+
+// QueryValidatorReserveResponse is the response type for Query/ValidatorReserve.
+message QueryValidatorReserveResponse {
+  ValidatorReserve reserve = 1 [
+    (gogoproto.nullable) = false,
+    (amino.dont_omitempty) = true
+  ];
+
+  // next_release is the amount that will be released at the next epoch.
+  string next_release = 2 [
+    (cosmos_proto.scalar) = "cosmos.Int",
+    (gogoproto.customtype) = "cosmossdk.io/math.Int",
+    (gogoproto.nullable) = false
+  ];
+}
+
+// QueryRestrictedAccountRequest is the request type for Query/RestrictedAccount.
+message QueryRestrictedAccountRequest {
+  string address = 1 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+}
+
+// QueryRestrictedAccountResponse is the response type for Query/RestrictedAccount.
+message QueryRestrictedAccountResponse {
+  RestrictedAccount account = 1 [
+    (gogoproto.nullable) = false,
+    (amino.dont_omitempty) = true
+  ];
+
+  // available is how much may still be transferred in the current period.
+  string available = 2 [
+    (cosmos_proto.scalar) = "cosmos.Int",
+    (gogoproto.customtype) = "cosmossdk.io/math.Int",
+    (gogoproto.nullable) = false
+  ];
+}
+
+// QueryRestrictedAccountsRequest is the request type for Query/RestrictedAccounts.
+message QueryRestrictedAccountsRequest {
+  cosmos.base.query.v1beta1.PageRequest pagination = 1;
+}
+
+// QueryRestrictedAccountsResponse is the response type for Query/RestrictedAccounts.
+message QueryRestrictedAccountsResponse {
+  repeated RestrictedAccount accounts = 1 [
+    (gogoproto.nullable) = false,
+    (amino.dont_omitempty) = true
+  ];
+
+  cosmos.base.query.v1beta1.PageResponse pagination = 2;
+}
+
+// QueryValidatorPerformanceRequest is the request type for Query/ValidatorPerformance.
+message QueryValidatorPerformanceRequest {
+  string validator_address = 1 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+}
+
+// QueryValidatorPerformanceResponse is the response type for Query/ValidatorPerformance.
+message QueryValidatorPerformanceResponse {
+  ValidatorPerformance performance = 1 [
     (gogoproto.nullable) = false,
     (amino.dont_omitempty) = true
   ];
