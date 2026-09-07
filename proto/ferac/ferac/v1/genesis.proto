@@ -1,0 +1,17 @@
+syntax = "proto3";
+package ferac.ferac.v1;
+
+import "amino/amino.proto";
+import "ferac/ferac/v1/params.proto";
+import "gogoproto/gogo.proto";
+
+option go_package = "github.com/serhiibudianskyi/ferac/x/ferac/types";
+
+// GenesisState defines the ferac module's genesis state.
+message GenesisState {
+  // params defines all the parameters of the module.
+  Params params = 1 [
+    (gogoproto.nullable) = false,
+    (amino.dont_omitempty) = true
+  ];
+}
