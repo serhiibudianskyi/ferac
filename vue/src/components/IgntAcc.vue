@@ -282,9 +282,9 @@ const tryToConnectWithMnemonic = async (): Promise<void> => {
 const getAccName = (): string => {
   return wallet.value?.name ?? "";
 };
-const disconnect = (): void => {
+const disconnect = async (): Promise<void> => {
   state.accountDropdown = false;
-  walletStore.signOut();
+  await walletStore.signOut();
 };
 const openWalletImport = (): void => {
   state.accountDropdown = false;

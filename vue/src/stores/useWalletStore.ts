@@ -1,3 +1,4 @@
+import { fromBech32 } from "@cosmjs/encoding";
 import { DirectSecp256k1HdWallet } from "@cosmjs/proto-signing";
 import CryptoJS from "crypto-js";
 import { defineStore } from "pinia";
@@ -11,6 +12,19 @@ const DEV_WALLETS_STORAGE_KEY = "ferac.dev.wallets";
 
 const getMnemonicStorageKey = () =>
   `ferac-dev-wallet:${window.location.origin}`;
+
+const sameAddress = (firstAddress: string, secondAddress: string) => {
+  try {
+    const first = fromBech32(firstAddress).data;
+    const second = fromBech32(secondAddress).data;
+    return (
+      first.length === second.length &&
+      first.every((byte, index) => byte === second[index])
+    );
+  } catch {
+    return firstAddress === secondAddress;
+  }
+};
 
 type StoredDevWallet = {
   name: string;
@@ -87,12 +101,27 @@ export const useWalletStore = defineStore("wallet", {
     },
   },
   actions: {
-    signOut() {
+    async signOut() {
+      const activeAddress =
+        this.selectedAddress || this.activeWallet?.accounts[0]?.address || "";
+      if (activeAddress) {
+        this.devWallets = this.devWallets.filter(
+          (wallet) => !sameAddress(wallet.address, activeAddress)
+        );
+      }
+      writeStoredDevWallets(this.devWallets);
+      const nextWallet = this.devWallets[0];
+      window.localStorage.removeItem("lastWallet");
+      window.localStorage.removeItem(DEV_MNEMONIC_STORAGE_KEY);
+      window.localStorage.removeItem(DEV_WALLET_NAME_STORAGE_KEY);
       this.selectedAddress = "";
       this.activeClient?.removeSigner();
       this.activeClient = null;
       this.activeWallet = null;
       this.authorized = false;
+      if (nextWallet) {
+        await this.switchToMnemonicWallet(nextWallet.address);
+      }
     },
     async connectWithKeplr() {
       const client = useClient();
@@ -115,6 +144,7 @@ export const useWalletStore = defineStore("wallet", {
         wallet.accounts.push({ address: account.address, pathIncrement: null });
 
         this.activeWallet = wallet;
+        this.selectedAddress = account.address;
         window.localStorage.setItem("lastWallet", wallet.name);
         if (
           this.activeWallet &&
