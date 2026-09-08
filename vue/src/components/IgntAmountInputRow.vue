@@ -19,6 +19,7 @@
 
     <div class="flex-1 w-full h-full">
       <IgntAmountInput
+        :max-decimals="amount.denom === 'uferac' ? 6 : 0"
         class="absolute w-full left-0 text-right h-full top-0 outline-0 focus:bg-gray-100 text-3xl font-medium rounded-lg px-4"
         @update="handleChange"
       />
