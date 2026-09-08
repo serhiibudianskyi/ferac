@@ -1,244 +1,331 @@
-version: 1
 validation: sovereign
-default_denom: uferac
-
-# ---------------------------------------------------------------------------
-# FOREVERGALACTIC (FERAC) genesis distribution of the fixed 88,888,888 FERAC
-# supply. 1 FERAC = 1,000,000 uferac (6 decimals). Minting is disabled, so no
-# token can ever exist beyond what is listed here.
-#
-# Category           %      FERAC             uferac
-# Creator            10%    8,888,888.8       8,888,888,800,000
-# Team                3%    2,666,666.64      2,666,666,640,000
-# Validator Reserve   4%    3,555,555.52      3,555,555,520,000
-# Community          35%   31,111,110.8      31,111,110,800,000  (8,000,000 FERAC
-#                                             of it seeds the 4 genesis validators)
-# DEX Liquidity      20%   17,777,777.6      17,777,777,600,000
-# Treasury           15%   13,333,333.2      13,333,333,200,000
-# Ecosystem          13%   11,555,555.44     11,555,555,440,000
-# Total             100%   88,888,888        88,888,888,000,000
-#
-# The mnemonics below are deterministic development keys. Replace them with
-# independently generated keys before launching a public network.
-# ---------------------------------------------------------------------------
+version: 1
 accounts:
-- name: creator
-  coins:
-  - 8888888800000uferac
-  mnemonic: "absurd amount doctor acoustic avoid letter advice cage absurd amount doctor acoustic avoid letter advice cage absurd amount doctor acoustic avoid letter advice comic"
-- name: team
-  coins:
-  - 2666666640000uferac
-  mnemonic: "acoustic avoid letter advice cage absurd amount doctor acoustic avoid letter advice cage absurd amount doctor acoustic avoid letter advice cage absurd amount exchange"
-- name: validator_reserve
-  coins:
-  - 3555555520000uferac
-  mnemonic: "adapt blossom school alcohol coral light army gather adapt blossom school alcohol coral light army gather adapt blossom school alcohol coral light army hold"
-- name: community
-  coins:
-  - 23111110800000uferac
-  mnemonic: "advice cage absurd amount doctor acoustic avoid letter advice cage absurd amount doctor acoustic avoid letter advice cage absurd amount doctor acoustic avoid negative"
-- name: dex_liquidity
-  coins:
-  - 17777777600000uferac
-  mnemonic: "agree choice donor anxiety expect little beef pass agree choice donor anxiety expect little beef pass agree choice donor anxiety expect little beef sample"
-- name: treasury
-  coins:
-  - 13333333200000uferac
-  mnemonic: "alcohol coral light army gather adapt blossom school alcohol coral light army gather adapt blossom school alcohol coral light army gather adapt blossom tackle"
-- name: ecosystem
-  coins:
-  - 11555555440000uferac
-  mnemonic: "alpha deal scrub asthma idea logic bright thought alpha deal scrub asthma idea logic bright thought alpha deal scrub asthma idea logic bright truly"
-# The four genesis validators are funded out of the community allocation and are
-# intentionally equal in stake and independently controlled.
-- name: val1
-  coins:
-  - 2000000000000uferac
-  mnemonic: "amount doctor acoustic avoid letter advice cage absurd amount doctor acoustic avoid letter advice cage absurd amount doctor acoustic avoid letter advice cage again"
-- name: val2
-  coins:
-  - 2000000000000uferac
-  mnemonic: "animal embark drastic bamboo mountain loyal category cancel animal embark drastic bamboo mountain loyal category cancel animal embark drastic bamboo mountain loyal category cover"
-- name: val3
-  coins:
-  - 2000000000000uferac
-  mnemonic: "anxiety expect little beef pass agree choice donor anxiety expect little beef pass agree choice donor anxiety expect little beef pass agree choice fire"
-- name: val4
-  coins:
-  - 2000000000000uferac
-  mnemonic: "arch flame security bid radar machine club gesture arch flame security bid radar machine club gesture arch flame security bid radar machine club lawn"
-
+    - name: creator
+      coins:
+        - 8888888800000uferac
+      mnemonic: absurd amount doctor acoustic avoid letter advice cage absurd amount doctor acoustic avoid letter advice cage absurd amount doctor acoustic avoid letter advice comic
+    - name: team
+      coins:
+        - 2666666640000uferac
+      mnemonic: acoustic avoid letter advice cage absurd amount doctor acoustic avoid letter advice cage absurd amount doctor acoustic avoid letter advice cage absurd amount exchange
+    - name: validator_reserve
+      coins:
+        - 3555555520000uferac
+      mnemonic: adapt blossom school alcohol coral light army gather adapt blossom school alcohol coral light army gather adapt blossom school alcohol coral light army hold
+    - name: community
+      coins:
+        - 23111110800000uferac
+      mnemonic: advice cage absurd amount doctor acoustic avoid letter advice cage absurd amount doctor acoustic avoid letter advice cage absurd amount doctor acoustic avoid negative
+    - name: dex_liquidity
+      coins:
+        - 17777777600000uferac
+      mnemonic: agree choice donor anxiety expect little beef pass agree choice donor anxiety expect little beef pass agree choice donor anxiety expect little beef sample
+    - name: treasury
+      coins:
+        - 13333333200000uferac
+      mnemonic: alcohol coral light army gather adapt blossom school alcohol coral light army gather adapt blossom school alcohol coral light army gather adapt blossom tackle
+    - name: ecosystem
+      coins:
+        - 11555555440000uferac
+      mnemonic: alpha deal scrub asthma idea logic bright thought alpha deal scrub asthma idea logic bright thought alpha deal scrub asthma idea logic bright truly
+    - name: val1
+      coins:
+        - 2000000000000uferac
+      mnemonic: amount doctor acoustic avoid letter advice cage absurd amount doctor acoustic avoid letter advice cage absurd amount doctor acoustic avoid letter advice cage again
+    - name: val2
+      coins:
+        - 2000000000000uferac
+      mnemonic: animal embark drastic bamboo mountain loyal category cancel animal embark drastic bamboo mountain loyal category cancel animal embark drastic bamboo mountain loyal category cover
+    - name: val3
+      coins:
+        - 2000000000000uferac
+      mnemonic: anxiety expect little beef pass agree choice donor anxiety expect little beef pass agree choice donor anxiety expect little beef pass agree choice fire
+    - name: val4
+      coins:
+        - 2000000000000uferac
+      mnemonic: arch flame security bid radar machine club gesture arch flame security bid radar machine club gesture arch flame security bid radar machine club lawn
 client:
-  openapi:
-    path: docs/static/openapi.json
-
-# 4 independent genesis validators, equal stake, 3-of-4 finality.
-validators:
-- name: val1
-  bonded: 1000000000000uferac
-  config:
-    consensus:
-      timeout_commit: "8s"
-      timeout_propose: "3s"
-  gentx:
-    commission-rate: "0.05"
-    commission-max-rate: "0.05"
-    commission-max-change-rate: "0.00"
-    min-self-delegation: "1000000000"
-- name: val2
-  bonded: 1000000000000uferac
-  config:
-    consensus:
-      timeout_commit: "8s"
-      timeout_propose: "3s"
-  gentx:
-    commission-rate: "0.05"
-    commission-max-rate: "0.05"
-    commission-max-change-rate: "0.00"
-    min-self-delegation: "1000000000"
-- name: val3
-  bonded: 1000000000000uferac
-  config:
-    consensus:
-      timeout_commit: "8s"
-      timeout_propose: "3s"
-  gentx:
-    commission-rate: "0.05"
-    commission-max-rate: "0.05"
-    commission-max-change-rate: "0.00"
-    min-self-delegation: "1000000000"
-- name: val4
-  bonded: 1000000000000uferac
-  config:
-    consensus:
-      timeout_commit: "8s"
-      timeout_propose: "3s"
-  gentx:
-    commission-rate: "0.05"
-    commission-max-rate: "0.05"
-    commission-max-change-rate: "0.00"
-    min-self-delegation: "1000000000"
-
+    typescript:
+        path: ts-client
+    openapi:
+        path: docs/static/openapi.json
+        exclude_list: []
 genesis:
-  consensus:
-    params:
-      block:
-        # Target throughput of ~1,000 TPS at an ~8 second block time.
-        max_bytes: "22020096"
-        max_gas: "400000000"
-  app_state:
-    bank:
-      denom_metadata:
-      - description: "FOREVERGALACTIC"
-        denom_units:
-        - denom: uferac
-          exponent: 0
-        - denom: FERAC
-          exponent: 6
-        base: uferac
-        display: FERAC
-        name: FOREVERGALACTIC
-        symbol: FERAC
-    staking:
-      params:
-        bond_denom: uferac
-        # Delegators unbond in 30 minutes. A validator reducing its own stake
-        # must additionally serve the 14 day exit notice enforced by x/ferac.
-        unbonding_time: "1800s"
-        max_validators: 100
-        max_entries: 7
-        historical_entries: 10000
-    mint:
-      minter:
-        inflation: "0.000000000000000000"
-        annual_provisions: "0.000000000000000000"
-      params:
-        mint_denom: uferac
-        # Inflation is pinned to zero: the 88,888,888 FERAC supply is fixed and
-        # no additional mint is possible.
-        inflation_rate_change: "0.000000000000000000"
-        inflation_max: "0.000000000000000000"
-        inflation_min: "0.000000000000000000"
-        goal_bonded: "0.670000000000000000"
-        blocks_per_year: "3942000"
-    distribution:
-      params:
-        community_tax: "0.000000000000000000"
-        withdraw_addr_enabled: true
-    slashing:
-      params:
-        signed_blocks_window: "10000"
-        min_signed_per_window: "0.500000000000000000"
-        downtime_jail_duration: "600s"
-        # Short downtime is not slashed at all; sustained downtime costs the
-        # validator half of its own stake.
-        slash_fraction_downtime: "0.500000000000000000"
-        # Double signing (equivocation) costs 25%.
-        slash_fraction_double_sign: "0.250000000000000000"
-    gov:
-      params:
-        min_deposit:
-        - denom: uferac
-          amount: "10000000000"
-        expedited_min_deposit:
-        - denom: uferac
-          amount: "50000000000"
-        max_deposit_period: "172800s"
-        # 7 day voting period acts as the timelock before a decision executes.
-        voting_period: "604800s"
-        expedited_voting_period: "86400s"
-        quorum: "0.334000000000000000"
-        # Tallying is strictly greater-than, so 0.70 is the threshold that lets
-        # exactly 3 of the 4 equally weighted genesis validators pass a regular
-        # proposal, while 2 of 4 (0.50) fails.
-        threshold: "0.700000000000000000"
-        # Expedited (technical) proposals require more than 3 of 4, i.e. the
-        # unanimous consent of the genesis set.
-        expedited_threshold: "0.750000000000000000"
-        veto_threshold: "0.334000000000000000"
-        burn_vote_quorum: false
-        burn_proposal_deposit_prevote: false
-        burn_vote_veto: true
-    ferac:
-      params:
-        denom: uferac
-        max_supply: "88888888000000"
-        restricted_release_rate: "0.250000000000000000"
-        restricted_period_seconds: "31536000"
-        reserve_release_rate: "0.050000000000000000"
-        reserve_period_seconds: "31536000"
-        stake_weight: "0.400000000000000000"
-        uptime_weight: "0.400000000000000000"
-        quality_weight: "0.200000000000000000"
-        network_fee_rate: "0.000100000000000000"
-        network_fee_validator_share: "0.500000000000000000"
-        dex_fee_rate: "0.000200000000000000"
-        max_validator_stake_share: "0.200000000000000000"
-        min_self_delegation: "1000000000"
-        validator_unbonding_seconds: "1209600"
-        genesis_validator_count: 4
-        genesis_finality_threshold: 3
-        supermajority_threshold: "0.666666666666666667"
-        validator_commission_rate: "0.050000000000000000"
-        treasury_address: "cosmos1lgdhj06gwvn0469jscassquv8rcf2pyypqr6z2"
-        max_validators_per_operator: 1
-      validator_reserve:
-        remaining: "3555555520000"
-        last_epoch_time: "0"
-        epoch: "0"
-      reserve_funder: "cosmos16rrc44wwf62n5qf28f9mjghqy0y3jdcygsrval"
-      restricted_accounts:
-      - address: "cosmos1v4d0dhfljhmwnpgtuwene4txqceat2w2hzgt6u"
-        category: ALLOCATION_CATEGORY_CREATOR
-        remaining: "8888888800000"
-        period_limit: "2222222200000"
-        released: "0"
-        period_start: "0"
-      - address: "cosmos1m7cltwrw2n2ljqn7ajukzv4ezfdxlule43fw37"
-        category: ALLOCATION_CATEGORY_TEAM
-        remaining: "2666666640000"
-        period_limit: "666666660000"
-        released: "0"
-        period_start: "0"
-      performances: []
+    app_state:
+        bank:
+            denom_metadata:
+                - base: uferac
+                  denom_units:
+                    - denom: uferac
+                      exponent: 0
+                    - denom: FERAC
+                      exponent: 6
+                  description: FOREVERGALACTIC
+                  display: FERAC
+                  name: FOREVERGALACTIC
+                  symbol: FERAC
+        distribution:
+            params:
+                community_tax: "0.000000000000000000"
+                withdraw_addr_enabled: true
+        ferac:
+            params:
+                denom: uferac
+                dex_fee_rate: "0.000200000000000000"
+                genesis_finality_threshold: 3
+                genesis_validator_count: 4
+                max_supply: "88888888000000"
+                max_validator_stake_share: "0.200000000000000000"
+                max_validators_per_operator: 1
+                min_self_delegation: "1000000000"
+                network_fee_rate: "0.000100000000000000"
+                network_fee_validator_share: "0.500000000000000000"
+                quality_weight: "0.200000000000000000"
+                reserve_period_seconds: "31536000"
+                reserve_release_rate: "0.050000000000000000"
+                restricted_period_seconds: "31536000"
+                restricted_release_rate: "0.250000000000000000"
+                stake_weight: "0.400000000000000000"
+                supermajority_threshold: "0.666666666666666667"
+                treasury_address: cosmos1lgdhj06gwvn0469jscassquv8rcf2pyypqr6z2
+                uptime_weight: "0.400000000000000000"
+                validator_commission_rate: "0.050000000000000000"
+                validator_unbonding_seconds: "1209600"
+            performances: []
+            reserve_funder: cosmos16rrc44wwf62n5qf28f9mjghqy0y3jdcygsrval
+            restricted_accounts:
+                - address: cosmos1v4d0dhfljhmwnpgtuwene4txqceat2w2hzgt6u
+                  category: ALLOCATION_CATEGORY_CREATOR
+                  period_limit: "2222222200000"
+                  period_start: "0"
+                  released: "0"
+                  remaining: "8888888800000"
+                - address: cosmos1m7cltwrw2n2ljqn7ajukzv4ezfdxlule43fw37
+                  category: ALLOCATION_CATEGORY_TEAM
+                  period_limit: "666666660000"
+                  period_start: "0"
+                  released: "0"
+                  remaining: "2666666640000"
+            validator_reserve:
+                epoch: "0"
+                last_epoch_time: "0"
+                remaining: "3555555520000"
+        gov:
+            params:
+                burn_proposal_deposit_prevote: false
+                burn_vote_quorum: false
+                burn_vote_veto: true
+                expedited_min_deposit:
+                    - amount: "50000000000"
+                      denom: uferac
+                expedited_threshold: "0.750000000000000000"
+                expedited_voting_period: 86400s
+                max_deposit_period: 172800s
+                min_deposit:
+                    - amount: "10000000000"
+                      denom: uferac
+                quorum: "0.334000000000000000"
+                threshold: "0.700000000000000000"
+                veto_threshold: "0.334000000000000000"
+                voting_period: 604800s
+        mint:
+            minter:
+                annual_provisions: "0.000000000000000000"
+                inflation: "0.000000000000000000"
+            params:
+                blocks_per_year: "3942000"
+                goal_bonded: "0.670000000000000000"
+                inflation_max: "0.000000000000000000"
+                inflation_min: "0.000000000000000000"
+                inflation_rate_change: "0.000000000000000000"
+                mint_denom: uferac
+        slashing:
+            params:
+                downtime_jail_duration: 600s
+                min_signed_per_window: "0.500000000000000000"
+                signed_blocks_window: "10000"
+                slash_fraction_double_sign: "0.250000000000000000"
+                slash_fraction_downtime: "0.500000000000000000"
+        staking:
+            params:
+                bond_denom: uferac
+                historical_entries: 10000
+                max_entries: 7
+                max_validators: 100
+                unbonding_time: 1800s
+    consensus:
+        params:
+            block:
+                max_bytes: "22020096"
+                max_gas: "400000000"
+default_denom: uferac
+validators:
+    - name: val1
+      bonded: 1000000000000uferac
+      config:
+        consensus:
+            timeout_commit: 8s
+            timeout_propose: 3s
+      gentx:
+        amount: ""
+        moniker: ""
+        keyring-backend: ""
+        chain-id: ""
+        commission-max-change-rate: "0.00"
+        commission-max-rate: "0.05"
+        commission-rate: "0.05"
+        details: ""
+        security-contact: ""
+        website: ""
+        account-number: 0
+        broadcast-mode: ""
+        dry-run: false
+        fee-account: ""
+        fee: ""
+        from: ""
+        gas: ""
+        gas-adjustment: ""
+        gas-prices: ""
+        generate-only: false
+        identity: ""
+        ip: ""
+        keyring-dir: ""
+        ledger: false
+        min-self-delegation: "1000000000"
+        node: ""
+        node-id: ""
+        note: ""
+        offline: false
+        output: ""
+        output-document: ""
+        pubkey: ""
+        sequence: 0
+        sign-mode: ""
+        timeout-height: 0
+    - name: val2
+      bonded: 1000000000000uferac
+      config:
+        consensus:
+            timeout_commit: 8s
+            timeout_propose: 3s
+      gentx:
+        amount: ""
+        moniker: ""
+        keyring-backend: ""
+        chain-id: ""
+        commission-max-change-rate: "0.00"
+        commission-max-rate: "0.05"
+        commission-rate: "0.05"
+        details: ""
+        security-contact: ""
+        website: ""
+        account-number: 0
+        broadcast-mode: ""
+        dry-run: false
+        fee-account: ""
+        fee: ""
+        from: ""
+        gas: ""
+        gas-adjustment: ""
+        gas-prices: ""
+        generate-only: false
+        identity: ""
+        ip: ""
+        keyring-dir: ""
+        ledger: false
+        min-self-delegation: "1000000000"
+        node: ""
+        node-id: ""
+        note: ""
+        offline: false
+        output: ""
+        output-document: ""
+        pubkey: ""
+        sequence: 0
+        sign-mode: ""
+        timeout-height: 0
+    - name: val3
+      bonded: 1000000000000uferac
+      config:
+        consensus:
+            timeout_commit: 8s
+            timeout_propose: 3s
+      gentx:
+        amount: ""
+        moniker: ""
+        keyring-backend: ""
+        chain-id: ""
+        commission-max-change-rate: "0.00"
+        commission-max-rate: "0.05"
+        commission-rate: "0.05"
+        details: ""
+        security-contact: ""
+        website: ""
+        account-number: 0
+        broadcast-mode: ""
+        dry-run: false
+        fee-account: ""
+        fee: ""
+        from: ""
+        gas: ""
+        gas-adjustment: ""
+        gas-prices: ""
+        generate-only: false
+        identity: ""
+        ip: ""
+        keyring-dir: ""
+        ledger: false
+        min-self-delegation: "1000000000"
+        node: ""
+        node-id: ""
+        note: ""
+        offline: false
+        output: ""
+        output-document: ""
+        pubkey: ""
+        sequence: 0
+        sign-mode: ""
+        timeout-height: 0
+    - name: val4
+      bonded: 1000000000000uferac
+      config:
+        consensus:
+            timeout_commit: 8s
+            timeout_propose: 3s
+      gentx:
+        amount: ""
+        moniker: ""
+        keyring-backend: ""
+        chain-id: ""
+        commission-max-change-rate: "0.00"
+        commission-max-rate: "0.05"
+        commission-rate: "0.05"
+        details: ""
+        security-contact: ""
+        website: ""
+        account-number: 0
+        broadcast-mode: ""
+        dry-run: false
+        fee-account: ""
+        fee: ""
+        from: ""
+        gas: ""
+        gas-adjustment: ""
+        gas-prices: ""
+        generate-only: false
+        identity: ""
+        ip: ""
+        keyring-dir: ""
+        ledger: false
+        min-self-delegation: "1000000000"
+        node: ""
+        node-id: ""
+        note: ""
+        offline: false
+        output: ""
+        output-document: ""
+        pubkey: ""
+        sequence: 0
+        sign-mode: ""
+        timeout-height: 0
