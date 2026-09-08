@@ -4,7 +4,6 @@ name: Build Ferac Binary
 
 on:
   push:
-    branches: [ main, master ]
   workflow_dispatch:
 
 jobs:
