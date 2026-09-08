@@ -12,7 +12,8 @@
           error: !hasEnoughBalance,
         }"
       >
-        {{ balance?.amount ?? 0 }} available
+        {{ formatDenomAmount(balance?.amount ?? "0", props.amount.denom) }}
+        available
       </div>
     </div>
 
@@ -32,6 +33,7 @@ import BigNumber from "bignumber.js";
 import { computed, type PropType, ref } from "vue";
 
 import { useAsset } from "../def-composables/useAsset";
+import { formatDenomAmount } from "../def-composables/useDenom";
 import type { Amount } from "../utils/interfaces";
 import IgntDenom from "./IgntDenom.vue";
 
@@ -45,19 +47,34 @@ const { balance } = useAsset(props.amount.denom);
 
 const emit = defineEmits(["change"]);
 const value = ref(
-  new BigNumber(props.amount.amount != "" ? props.amount.amount : 0)
+  new BigNumber(
+    props.amount.amount != ""
+      ? props.amount.denom === "uferac"
+        ? new BigNumber(props.amount.amount).dividedBy(1_000_000)
+        : props.amount.amount
+      : 0
+  )
 );
 const hasEnoughBalance = computed(() => {
   const balanceBN = new BigNumber(balance.value?.amount ?? 0);
-  if (Number(value)) {
-    return balanceBN.gte(value.value);
+  const requestedAmount =
+    props.amount.denom === "uferac"
+      ? value.value.multipliedBy(1_000_000)
+      : value.value;
+  if (requestedAmount.isPositive()) {
+    return balanceBN.gte(requestedAmount);
   } else {
     return true;
   }
 });
 const handleChange = (amount: BigNumber) => {
+  value.value = amount;
   if (hasEnoughBalance.value) {
-    emit("change", amount.toString());
+    const rawAmount =
+      props.amount.denom === "uferac"
+        ? amount.multipliedBy(1_000_000).toFixed(0)
+        : amount.toString();
+    emit("change", rawAmount);
   }
 };
 </script>

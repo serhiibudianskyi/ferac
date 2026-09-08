@@ -1,3 +1,4 @@
+import BigNumber from "bignumber.js";
 import { computed, ref } from "vue";
 
 import useIbcApplicationsTransferV1 from "@/composables/useIbcApplicationsTransferV1";
@@ -6,6 +7,21 @@ const useDenomInstances = {} as Record<
   string,
   ReturnType<typeof useDenomInstance>
 >;
+const FERAC_BASE_DENOM = "uferac";
+const FERAC_DISPLAY_DENOM = "FERAC";
+
+export const formatDenomAmount = (amount: string, denom: string): string => {
+  if (denom !== FERAC_BASE_DENOM) {
+    return amount;
+  }
+
+  const parsedAmount = new BigNumber(amount || 0);
+  if (!parsedAmount.isFinite()) {
+    return "0.000000";
+  }
+
+  return parsedAmount.dividedBy(1_000_000).toFormat(6);
+};
 const traceToPath = (trace: { port_id: string; channel_id: string }[] | undefined) => {
   if (!trace || trace.length === 0) {
     return "";
@@ -22,6 +38,9 @@ const useDenomInstance = (denom: string) => {
     if (isIBC) {
       return denomTrace.value?.denom?.base?.toUpperCase() ?? "";
     } else {
+      if (denom === FERAC_BASE_DENOM) {
+        return FERAC_DISPLAY_DENOM;
+      }
       return denom.toUpperCase();
     }
   });

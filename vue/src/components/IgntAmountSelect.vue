@@ -76,7 +76,9 @@
                 <IgntDenom :denom="x.denom" :shorten="false" />
               </div>
 
-              <div class="text-xs">{{ parseAmount(x.amount) }} available</div>
+              <div class="text-xs">
+                {{ formatDenomAmount(x.amount, x.denom) }} available
+              </div>
             </div>
           </div>
         </div>
@@ -90,10 +92,9 @@ import { IgntModal } from "@ignt/vue-library";
 import { IgntSearchIcon } from "@ignt/vue-library";
 import { IgntAddIcon } from "@ignt/vue-library";
 import { IgntClearIcon } from "@ignt/vue-library";
-import BigNumber from "bignumber.js";
 import { computed, type PropType, reactive } from "vue";
 
-import { useDenom } from "@/def-composables/useDenom";
+import { formatDenomAmount, useDenom } from "@/def-composables/useDenom";
 import type { Amount } from "@/utils/interfaces";
 
 import IgntAmountInputRow from "./IgntAmountInputRow.vue";
@@ -140,10 +141,6 @@ const ableToBeSelected = computed(() => {
   };
   return props.balances?.filter(notSelected).filter(searchFilter) ?? [];
 });
-
-const parseAmount = (amount: string): BigNumber => {
-  return amount == "" ? new BigNumber(0) : new BigNumber(amount);
-};
 
 const handleInputChange = (val: Amount) => {
   const newSelected: Array<Amount> = [...(props.selected ?? [])];

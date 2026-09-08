@@ -28,6 +28,9 @@
         :balances="(balances.assets as Amount[])"
         @update="handleTxAmountUpdate"
       />
+      <div class="px-4 text-xs text-gray-500">
+        Estimated fee: {{ formatDenomAmount(estimatedFee, "uferac") }} FERAC
+      </div>
     </div>
 
     <div
@@ -120,14 +123,15 @@
 import { fromBech32 } from "@cosmjs/encoding";
 import { IgntButton } from "@ignt/vue-library";
 import { IgntChevronDownIcon } from "@ignt/vue-library";
+import { useQueryClient } from "@tanstack/vue-query";
 import BigNumber from "bignumber.js";
 import Long from "long";
-import { reactive } from "vue";
-import { computed } from "vue";
+import { computed, reactive, watch } from "vue";
 
 import { useClient } from "@/composables/useClient";
 import { useAddress } from "@/def-composables/useAddress";
 import { useAssets } from "@/def-composables/useAssets";
+import { formatDenomAmount } from "@/def-composables/useDenom";
 import type { Amount } from "@/utils/interfaces";
 
 import IgntAmountSelect from "./IgntAmountSelect.vue";
@@ -175,6 +179,7 @@ const initialState: State = {
 };
 const state = reactive(initialState);
 const client = useClient();
+const queryClient = useQueryClient();
 const sendMsgSend = client.CosmosBankV_1Beta_1.tx.sendMsgSend;
 const sendMsgTransfer = client.IbcApplicationsTransferV_1.tx.sendMsgTransfer;
 const { address } = useAddress();
@@ -252,6 +257,18 @@ const sendTx = async (): Promise<void> => {
     if (txResult.code) {
       throw new Error(txResult.rawLog || `Transaction failed with code ${txResult.code}`);
     }
+    await queryClient.invalidateQueries({
+      predicate: ({ queryKey }) => {
+        const queryType = (queryKey[0] as { type?: string })?.type;
+        return [
+          "ServiceGetTxsEvent",
+          "QueryAllBalances",
+          "QueryBalance",
+          "QuerySpendableBalances",
+          "QuerySpendableBalanceByDenom",
+        ].includes(queryType ?? "");
+      },
+    });
     resetTx();
     state.currentUIState = UI_STATE.TX_SUCCESS;
     setTimeout(() => {
@@ -282,6 +299,28 @@ const hasAnyBalance = computed<boolean>(
     balances.value.assets.length > 0 &&
     balances.value.assets.some((x) => parseAmount(x.amount ?? "0").isPositive())
 );
+const estimatedFee = computed(() => {
+  const safeAmount = (amount: string | undefined) => {
+    const parsedAmount = new BigNumber(amount || 0);
+    return parsedAmount.isFinite() ? parsedAmount : new BigNumber(0);
+  };
+  const transferAmount = state.tx.amounts.reduce(
+    (total, amount) =>
+      amount.denom === "uferac"
+        ? total.plus(safeAmount(amount.amount))
+        : total,
+    new BigNumber(0)
+  );
+  const gasFee = state.tx.fees
+    .filter((fee) => fee.denom === "uferac")
+    .reduce(
+      (total, fee) => total.plus(safeAmount(fee.amount)),
+      new BigNumber(0)
+    );
+  const baseGasFee = state.tx.fees.length > 0 ? gasFee : new BigNumber(20);
+
+  return baseGasFee.plus(transferAmount.multipliedBy(0.0001)).toFixed(0);
+});
 const isTxOngoing = computed<boolean>(() => {
   return state.currentUIState === UI_STATE.TX_SIGNING;
 });
@@ -330,15 +369,15 @@ const ableToTx = computed<boolean>(
     validTxFees.value &&
     !!address.value
 );
-const bootstrapTxAmount = () => {
-  if (hasAnyBalance.value) {
-    const firstBalance = balances.value.assets[0];
-
-    state.tx.amounts[0] = {
-      ...firstBalance,
-      amount: "",
-    };
-  }
-};
-bootstrapTxAmount();
+watch(
+  () => balances.value.assets,
+  (assets) => {
+    if (state.tx.amounts.length === 0 && assets.length > 0) {
+      const feracBalance = assets.find((asset) => asset.denom === "uferac");
+      const defaultBalance = feracBalance ?? assets[0];
+      state.tx.amounts = [{ ...defaultBalance, amount: "" }];
+    }
+  },
+  { immediate: true }
+);
 </script>

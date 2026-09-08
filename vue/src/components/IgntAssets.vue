@@ -66,7 +66,7 @@
             />
           </td>
           <td class="text-right font-bold py-5 text-black text-lg">
-            {{ new Intl.NumberFormat("en-GB").format(Number(balance?.amount)) }}
+            {{ formatDenomAmount(balance?.amount ?? "0", balance?.denom ?? "") }}
           </td>
         </tr>
         <tr v-if="noSearchResults">
@@ -126,7 +126,7 @@ import { computed, nextTick, ref, toRefs } from "vue";
 
 import { useAddress } from "../def-composables/useAddress";
 import { useAssets } from "../def-composables/useAssets";
-import { useDenom } from "../def-composables/useDenom";
+import { formatDenomAmount, useDenom } from "../def-composables/useDenom";
 import IgntDenom from "./IgntDenom.vue";
 
 const props = defineProps({
@@ -202,7 +202,7 @@ const resetSearch = () => {
   state.value.searchQuery = "";
   nextTick(() => state.value.searchInput?.focus());
 };
-const { searchQuery, searchInput, chosenDisplayLimit, balanceList } = toRefs(state.value);
+const { searchQuery, searchInput, chosenDisplayLimit } = toRefs(state.value);
 </script>
 
 <style lang="scss" scoped>

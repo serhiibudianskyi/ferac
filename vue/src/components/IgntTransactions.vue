@@ -39,9 +39,8 @@
                 }"
                 class="p-1 rounded-md"
               >
-                {{
-                  tx.type == "received" ? "+" + amount.amount : -amount.amount
-                }}
+                {{ tx.type == "received" ? "+" : "-" }}
+                {{ formatDenomAmount(amount.amount, amount.denom) }}
                 <IgntDenom :denom="amount.denom ?? ''" />
               </span>
             </div>
@@ -79,6 +78,7 @@ import { IgntArrowIcon } from "@ignt/vue-library";
 import dayjs from "dayjs";
 import { computed } from "vue";
 
+import { formatDenomAmount } from "@/def-composables/useDenom";
 import { useTransactions } from "@/def-composables/useTransactions";
 
 import IgntDenom from "./IgntDenom.vue";
