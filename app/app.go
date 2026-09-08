@@ -54,7 +54,7 @@ const (
 	// Name is the name of the application.
 	Name = "ferac"
 	// AccountAddressPrefix is the prefix for accounts addresses.
-	AccountAddressPrefix = "cosmos"
+	AccountAddressPrefix = "f8-"
 	// ChainCoinType is the coin type of the chain.
 	ChainCoinType = 118
 )
