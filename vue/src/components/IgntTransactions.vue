@@ -5,9 +5,9 @@
         Transactions
       </h2>
     </header>
-    <table class="table-auto w-full" v-if="txs.length > 0">
+    <table class="transaction-table table-auto w-full" v-if="txs.length > 0">
       <tr v-for="(tx, i) in txs" :key="tx.txhash + '_' + i">
-        <td class="flex text-xs py-2">
+        <td class="transaction-row flex min-w-0 text-xs py-2">
           <div
             :class="{
               'rotate-180 text-green-500': tx.type == 'received',
@@ -17,7 +17,7 @@
           >
             <IgntTxArrowIcon />
           </div>
-          <div class="flex flex-col justify-between flex-1">
+          <div class="transaction-meta flex min-w-0 flex-col justify-between flex-1">
             <div class="font-medium">
               {{ shortenHash(tx.txhash ?? "") }}
               <span class="font-bold text-warning">{{
@@ -28,7 +28,7 @@
               {{ dayjs(tx.timestamp).format("MMMM D YYYY, h:mma") }}
             </div>
           </div>
-          <div class="flex flex-col justify-between items-end">
+          <div class="transaction-details flex min-w-0 max-w-[48%] flex-col justify-between items-end">
             <div class="font-medium text-right text-xs text-gray-600 inline">
               <span
                 v-for="(amount, index) in tx.amount"

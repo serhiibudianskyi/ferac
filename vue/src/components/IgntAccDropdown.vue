@@ -2,7 +2,7 @@
   <transition name="dropdown-fade">
     <div
       v-if="showDefault"
-      class="top-20 right-8 shadow-std bg-white-1000 rounded absolute max-w-xs p-7 z-50 w-full box-border acc-dd"
+      class="wallet-dropdown top-20 right-8 shadow-std bg-white-1000 rounded absolute max-w-xs p-7 z-50 w-full box-border acc-dd"
     >
       <span class="text-sm leading-normal text-gray-660 mb-3 block text-[13px]"
         >Connected wallet</span
@@ -23,6 +23,39 @@
           </span>
         </div>
       </div>
+      <div v-if="devWallets.length > 1" class="mb-4">
+        <div class="text-xs text-gray-660 mb-2">Local wallets</div>
+        <div
+          v-for="localWallet in devWallets"
+          :key="localWallet.address"
+          role="button"
+          tabindex="0"
+          class="block w-full text-left py-2 px-3 rounded hover:bg-gray-100"
+          :class="{ 'font-bold bg-gray-100': localWallet.address === address }"
+          @click="selectWallet(localWallet.address)"
+        >
+          <span class="block">{{ localWallet.name }}</span>
+          <span class="flex items-center text-xs text-gray-660">
+            {{ localWallet.address.slice(0, 10) }}...
+            <button
+              type="button"
+              class="ml-2 cursor-pointer hover:text-black"
+              title="Copy wallet address"
+              aria-label="Copy wallet address"
+              @click.stop="copy(localWallet.address)"
+            >
+              <IgntCopyIcon />
+            </button>
+          </span>
+        </div>
+      </div>
+      <div
+        class="flex justify-between items-center cursor-pointer hover:text-gray-660"
+        @click="$emit('add-wallet')"
+      >
+        <span> Import another wallet </span>
+      </div>
+      <hr class="divide-y my-3 -mx-7" />
       <div
         class="flex justify-between items-center cursor-pointer hover:text-gray-660"
         @click="$emit('disconnect')"
@@ -79,7 +112,7 @@
     </div>
     <div
       v-else-if="showSettings"
-      class="top-20 right-8 shadow-std bg-white rounded absolute max-w-xs p-7 z-50 w-full box-border acc-dd"
+      class="wallet-dropdown top-20 right-8 shadow-std bg-white rounded absolute max-w-xs p-7 z-50 w-full box-border acc-dd"
     >
       <header class="flex items-center -mx-7 -mt-7 px-3 pt-3 pb-7">
         <div class="cursor-pointer" @click="switchToDefault">
@@ -133,7 +166,13 @@ import { IgntChevronRightIcon } from "@ignt/vue-library";
 import { IgntExternalArrowIcon } from "@ignt/vue-library";
 import { IgntProfileIcon } from "@ignt/vue-library";
 import { IgntCopyIcon } from "@ignt/vue-library";
-import { computed, onBeforeUnmount, onMounted, reactive } from "vue";
+import {
+  computed,
+  onBeforeUnmount,
+  onMounted,
+  reactive,
+  type PropType,
+} from "vue";
 
 import useCosmosBaseTendermintV1Beta1 from "@/composables/useCosmosBaseTendermintV1Beta1";
 import { useConnectionStatus } from "@/def-composables/useConnectionStatus";
@@ -145,6 +184,11 @@ enum UI_STATE {
   DEFAULT = 1,
 
   SETTINGS = 2,
+}
+
+interface LocalWallet {
+  name: string;
+  address: string;
 }
 
 interface State {
@@ -165,8 +209,12 @@ defineProps({
     type: String,
     required: true,
   },
+  devWallets: {
+    type: Array as PropType<LocalWallet[]>,
+    default: () => [],
+  },
 });
-const emit = defineEmits(["disconnect", "close"]);
+const emit = defineEmits(["disconnect", "close", "select-wallet", "add-wallet"]);
 
 // composables
 const { address, shortAddress } = useAddress();
@@ -206,6 +254,9 @@ const switchToSettings = () => {
 };
 const switchToDefault = () => {
   state.currentUIState = UI_STATE.DEFAULT;
+};
+const selectWallet = (address: string) => {
+  emit("select-wallet", address);
 };
 
 // lh

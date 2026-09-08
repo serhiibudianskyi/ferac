@@ -17,7 +17,7 @@
           type="search"
           autocomplete="off"
           placeholder="Search assets"
-          class="w-48 -ml-8 pl-10 pr-10 leading-12 h-12 appearance-none outline-none border-none rounded-xl focus:shadow-outline"
+          class="asset-search w-48 -ml-8 pl-10 pr-10 leading-12 h-12 appearance-none outline-none border-none rounded-xl focus:shadow-outline"
           @input="(evt: Event) => {
             resetDisplayLimit();
             return evt;
@@ -32,7 +32,7 @@
         </div>
       </div>
     </header>
-    <table class="table-auto w-full">
+    <table class="asset-table table-auto w-full">
       <thead v-if="balances.assets.length">
         <tr>
           <td class="text-left text-xs text-black opacity-70">Asset</td>

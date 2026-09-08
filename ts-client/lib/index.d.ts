@@ -34,9 +34,17 @@ declare const Client: typeof IgniteClient & import("./helpers").Constructor<{
         updateTX(client: IgniteClient): void;
     };
 } & {
-    CosmosCircuitV_1: {
-        query: ReturnType<typeof import("./cosmos.circuit.v1").queryClient>;
-        tx: ReturnType<typeof import("./cosmos.circuit.v1").txClient>;
+    CosmosNftV_1Beta_1: {
+        query: ReturnType<typeof import("./cosmos.nft.v1beta1").queryClient>;
+        tx: ReturnType<typeof import("./cosmos.nft.v1beta1").txClient>;
+        structure: Record<string, unknown>;
+        registry: Array<[string, import("@cosmjs/proto-signing").GeneratedType]>;
+        updateTX(client: IgniteClient): void;
+    };
+} & {
+    CosmosUpgradeV_1Beta_1: {
+        query: ReturnType<typeof import("./cosmos.upgrade.v1beta1").queryClient>;
+        tx: ReturnType<typeof import("./cosmos.upgrade.v1beta1").txClient>;
         structure: Record<string, unknown>;
         registry: Array<[string, import("@cosmjs/proto-signing").GeneratedType]>;
         updateTX(client: IgniteClient): void;
@@ -154,38 +162,6 @@ declare const Client: typeof IgniteClient & import("./helpers").Constructor<{
         updateTX(client: IgniteClient): void;
     };
 } & {
-    CosmosFeegrantV_1Beta_1: {
-        query: ReturnType<typeof import("./cosmos.feegrant.v1beta1").queryClient>;
-        tx: ReturnType<typeof import("./cosmos.feegrant.v1beta1").txClient>;
-        structure: Record<string, unknown>;
-        registry: Array<[string, import("@cosmjs/proto-signing").GeneratedType]>;
-        updateTX(client: IgniteClient): void;
-    };
-} & {
-    CosmosEvidenceV_1Beta_1: {
-        query: ReturnType<typeof import("./cosmos.evidence.v1beta1").queryClient>;
-        tx: ReturnType<typeof import("./cosmos.evidence.v1beta1").txClient>;
-        structure: Record<string, unknown>;
-        registry: Array<[string, import("@cosmjs/proto-signing").GeneratedType]>;
-        updateTX(client: IgniteClient): void;
-    };
-} & {
-    CosmosNftV_1Beta_1: {
-        query: ReturnType<typeof import("./cosmos.nft.v1beta1").queryClient>;
-        tx: ReturnType<typeof import("./cosmos.nft.v1beta1").txClient>;
-        structure: Record<string, unknown>;
-        registry: Array<[string, import("@cosmjs/proto-signing").GeneratedType]>;
-        updateTX(client: IgniteClient): void;
-    };
-} & {
-    CosmosUpgradeV_1Beta_1: {
-        query: ReturnType<typeof import("./cosmos.upgrade.v1beta1").queryClient>;
-        tx: ReturnType<typeof import("./cosmos.upgrade.v1beta1").txClient>;
-        structure: Record<string, unknown>;
-        registry: Array<[string, import("@cosmjs/proto-signing").GeneratedType]>;
-        updateTX(client: IgniteClient): void;
-    };
-} & {
     IbcApplicationsInterchainAccountsControllerV_1: {
         query: ReturnType<typeof import("./ibc.applications.interchain_accounts.controller.v1").queryClient>;
         tx: ReturnType<typeof import("./ibc.applications.interchain_accounts.controller.v1").txClient>;
@@ -245,6 +221,30 @@ declare const Client: typeof IgniteClient & import("./helpers").Constructor<{
     IbcCoreConnectionV_1: {
         query: ReturnType<typeof import("./ibc.core.connection.v1").queryClient>;
         tx: ReturnType<typeof import("./ibc.core.connection.v1").txClient>;
+        structure: Record<string, unknown>;
+        registry: Array<[string, import("@cosmjs/proto-signing").GeneratedType]>;
+        updateTX(client: IgniteClient): void;
+    };
+} & {
+    CosmosEvidenceV_1Beta_1: {
+        query: ReturnType<typeof import("./cosmos.evidence.v1beta1").queryClient>;
+        tx: ReturnType<typeof import("./cosmos.evidence.v1beta1").txClient>;
+        structure: Record<string, unknown>;
+        registry: Array<[string, import("@cosmjs/proto-signing").GeneratedType]>;
+        updateTX(client: IgniteClient): void;
+    };
+} & {
+    CosmosFeegrantV_1Beta_1: {
+        query: ReturnType<typeof import("./cosmos.feegrant.v1beta1").queryClient>;
+        tx: ReturnType<typeof import("./cosmos.feegrant.v1beta1").txClient>;
+        structure: Record<string, unknown>;
+        registry: Array<[string, import("@cosmjs/proto-signing").GeneratedType]>;
+        updateTX(client: IgniteClient): void;
+    };
+} & {
+    CosmosCircuitV_1: {
+        query: ReturnType<typeof import("./cosmos.circuit.v1").queryClient>;
+        tx: ReturnType<typeof import("./cosmos.circuit.v1").txClient>;
         structure: Record<string, unknown>;
         registry: Array<[string, import("@cosmjs/proto-signing").GeneratedType]>;
         updateTX(client: IgniteClient): void;

@@ -26,7 +26,10 @@
       v-if="state.accountDropdown && wallet"
       :wallet="wallet"
       :acc-name="getAccName()"
+      :dev-wallets="walletStore.getDevWallets"
       @disconnect="disconnect"
+      @select-wallet="selectWallet"
+      @add-wallet="openWalletImport"
       @close="state.accountDropdown = false"
     />
     <IgntModal
@@ -47,15 +50,18 @@
           <h3 v-if="isKeplrAvailable" class="text-2xl font-bold">
             Connect your wallet
           </h3>
-          <h3 v-else>Install Keplr</h3>
+          <h3 v-else>Connect your wallet</h3>
         </div>
         <div v-else-if="state.modalPage === 'connecting'">
           <div class="description-grey">Opening Keplr</div>
           <h3>Connecting</h3>
         </div>
+        <div v-else-if="state.modalPage === 'mnemonic'">
+          <h3>Import dev wallet</h3>
+        </div>
         <div v-else-if="state.modalPage === 'error'">
           <IgntWarningIcon style="margin-bottom: 20px" />
-          <h3>Keplr cannot launch</h3>
+          <h3>{{ state.errorMessage }}</h3>
         </div>
       </template>
       <template #body>
@@ -66,8 +72,8 @@
               this app.
             </p>
             <p v-else>
-              Install & connect your Keplr wallet via the Keplr browser
-              extension to use this app.
+              Connect with a local development mnemonic or install Keplr to use
+              a browser wallet.
             </p>
           </div>
           <div v-else-if="state.modalPage === 'connecting'">
@@ -84,6 +90,29 @@
             </IgntButton>
             <div class="external-link mt-8">Having trouble opening Keplr?</div>
           </div>
+          <div v-else-if="state.modalPage === 'mnemonic'" class="text-left">
+            <label class="text-xs text-gray-600" for="dev-wallet-name">
+              Wallet name
+            </label>
+            <input
+              id="dev-wallet-name"
+              v-model="state.localWalletName"
+              class="mt-1 mb-4 py-2 px-4 h-12 bg-gray-100 border-xs text-base leading-tight w-full rounded-xl outline-0"
+              placeholder="Local Dev Wallet"
+            />
+            <label class="text-xs text-gray-600" for="dev-wallet-mnemonic">
+              Mnemonic
+            </label>
+            <textarea
+              id="dev-wallet-mnemonic"
+              v-model="state.mnemonic"
+              class="mt-1 py-2 px-4 min-h-28 bg-gray-100 border-xs text-base leading-tight w-full rounded-xl outline-0 resize-none"
+              placeholder="Enter a local development mnemonic"
+            />
+            <p class="mt-3 text-xs text-gray-500 text-center">
+              The mnemonic is used only in this browser session and is not saved.
+            </p>
+          </div>
           <div v-else-if="state.modalPage === 'error'" style="padding: 20px 0">
             <div class="external-link">
               <span>Keplr troubleshooting</span>
@@ -92,14 +121,44 @@
           </div>
         </div>
       </template>
-      <template v-if="isKeplrAvailable" #footer>
+      <template #footer>
         <div v-if="state.modalPage === 'connect'" class="my-3">
+          <div style="gap: 10px; display: flex; justify-content: center; flex-wrap: wrap">
+            <IgntButton
+              v-if="isKeplrAvailable"
+              aria-label="Connect Keplr"
+              type="primary"
+              @click="tryToConnectToKeplr"
+            >
+              Connect Keplr
+            </IgntButton>
+            <IgntButton
+              aria-label="Import local mnemonic"
+              type="secondary"
+              @click="state.modalPage = 'mnemonic'"
+            >
+              Import mnemonic
+            </IgntButton>
+          </div>
+        </div>
+        <div
+          v-if="state.modalPage === 'mnemonic'"
+          style="gap: 10px; display: flex; justify-content: center"
+        >
           <IgntButton
-            aria-label="Connect Keplr"
-            type="primary"
-            @click="tryToConnectToKeplr"
+            aria-label="Cancel mnemonic import"
+            type="secondary"
+            @click="state.modalPage = 'connect'"
           >
-            Connect Keplr
+            Cancel
+          </IgntButton>
+          <IgntButton
+            aria-label="Connect local wallet"
+            type="primary"
+            :disabled="state.mnemonic.trim().split(/\s+/).length < 12"
+            @click="tryToConnectWithMnemonic"
+          >
+            Connect
           </IgntButton>
         </div>
         <div
@@ -148,6 +207,9 @@ export interface State {
   connectWalletModal: boolean;
   accountDropdown: boolean;
   keplrParams: { name: string; bech32Address: string };
+  localWalletName: string;
+  mnemonic: string;
+  errorMessage: string;
 }
 
 const initialState: State = {
@@ -155,6 +217,9 @@ const initialState: State = {
   connectWalletModal: false,
   accountDropdown: false,
   keplrParams: { name: "", bech32Address: "" },
+  localWalletName: "Local Dev Wallet",
+  mnemonic: "",
+  errorMessage: "Wallet cannot connect",
 };
 
 // state
@@ -175,7 +240,7 @@ const chainId = computed(
 watch(
   () => chainId.value,
   async (newVal) => {
-    if (newVal != "") {
+    if (newVal != "" && wallet.value?.name === "Keplr Integration") {
       const { name, bech32Address } = await getKeplrAccParams(newVal);
       state.keplrParams.name = name;
       state.keplrParams.bech32Address = bech32Address;
@@ -197,20 +262,63 @@ const tryToConnectToKeplr = (): void => {
 
   connectToKeplr(onKeplrConnect, onKeplrError);
 };
-const getAccName = (): string => {
-  if (client.signer) {
-    return state.keplrParams.name;
-  } else {
-    return "";
+const tryToConnectWithMnemonic = async (): Promise<void> => {
+  try {
+    await walletStore.connectWithMnemonic(
+      state.mnemonic,
+      state.localWalletName.trim() || "Local Dev Wallet"
+    );
+    state.keplrParams.name = state.localWalletName.trim() || "Local Dev Wallet";
+    state.keplrParams.bech32Address = walletStore.getAddress;
+    state.mnemonic = "";
+    state.connectWalletModal = false;
+    state.modalPage = "connect";
+  } catch (e) {
+    console.error(e);
+    state.errorMessage = "Mnemonic cannot be imported";
+    state.modalPage = "error";
   }
+};
+const getAccName = (): string => {
+  return wallet.value?.name ?? "";
 };
 const disconnect = (): void => {
   state.accountDropdown = false;
   walletStore.signOut();
 };
+const openWalletImport = (): void => {
+  state.accountDropdown = false;
+  state.modalPage = "mnemonic";
+  state.connectWalletModal = true;
+};
+const selectWallet = async (address: string): Promise<void> => {
+  try {
+    await walletStore.switchToMnemonicWallet(address);
+    state.keplrParams.name = walletStore.getWallet?.name ?? "";
+    state.keplrParams.bech32Address = walletStore.getAddress;
+    state.accountDropdown = false;
+  } catch (e) {
+    console.error(e);
+    state.errorMessage = "Wallet cannot be switched";
+    state.accountDropdown = false;
+    state.modalPage = "error";
+    state.connectWalletModal = true;
+  }
+};
 
 // check if already connected
 onMounted(async () => {
+  try {
+    if (await walletStore.restoreMnemonicWallet()) {
+      state.keplrParams.name = walletStore.getWallet?.name ?? "";
+      state.keplrParams.bech32Address = walletStore.getAddress;
+      return;
+    }
+  } catch (e) {
+    console.warn("Saved local wallet could not be restored", e);
+    walletStore.signOut();
+  }
+
   if (client.signer) {
     try {
       await tryToConnectToKeplr();

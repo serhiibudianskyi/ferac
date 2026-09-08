@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "@cosmjs/proto-signing": "0.33.1",
     "@tailwindcss/vite": "^4.1.10",
     "@tanstack/vue-query": "^5.81.2",
     "crypto-js": "^4.2.0",

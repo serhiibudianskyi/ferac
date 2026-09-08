@@ -1,12 +1,12 @@
 <template>
   <div>
-    <div class="container mx-auto">
-      <div class="grid grid-cols-2">
-        <div>
-          <IgntAssets :key="address" class="px-2.5 mb-10" :display-limit="3" />
-          <IgntTransactions :key="address" class="px-2.5" />
+    <div class="container mx-auto px-4 sm:px-6">
+      <div class="grid grid-cols-1 gap-10 md:grid-cols-2 md:gap-6">
+        <div class="min-w-0">
+          <IgntAssets :key="address" class="mb-10" :display-limit="3" />
+          <IgntTransactions :key="address" />
         </div>
-        <IgntTransfer class="px-2.5 w-4/6 mx-auto" />
+        <IgntTransfer class="w-full max-w-xl mx-auto" />
       </div>
     </div>
   </div>

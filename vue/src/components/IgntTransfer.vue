@@ -1,4 +1,5 @@
 <template>
+  <div class="transfer-panel min-w-0">
   <IgntTabs
     :tabHeaderClasses="[
       'text-3xl',
@@ -35,6 +36,7 @@
       </IgntCard>
     </div>
   </IgntTabs>
+  </div>
 </template>
 <script setup lang="ts">
 import { IgntTabs } from "@ignt/vue-library";

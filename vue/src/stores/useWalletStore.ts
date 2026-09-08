@@ -1,8 +1,39 @@
+import { DirectSecp256k1HdWallet } from "@cosmjs/proto-signing";
 import CryptoJS from "crypto-js";
 import { defineStore } from "pinia";
 
 import { useClient } from "@/composables/useClient";
 import type { EncodedWallet, Nullable, Wallet } from "@/utils/interfaces";
+
+const DEV_MNEMONIC_STORAGE_KEY = "ferac.dev.mnemonic";
+const DEV_WALLET_NAME_STORAGE_KEY = "ferac.dev.walletName";
+const DEV_WALLETS_STORAGE_KEY = "ferac.dev.wallets";
+
+const getMnemonicStorageKey = () =>
+  `ferac-dev-wallet:${window.location.origin}`;
+
+type StoredDevWallet = {
+  name: string;
+  address: string;
+  encryptedMnemonic: string;
+};
+
+const readStoredDevWallets = (): StoredDevWallet[] => {
+  const stored = window.localStorage.getItem(DEV_WALLETS_STORAGE_KEY);
+  if (!stored) {
+    return [];
+  }
+
+  try {
+    return JSON.parse(stored) as StoredDevWallet[];
+  } catch {
+    return [];
+  }
+};
+
+const writeStoredDevWallets = (wallets: StoredDevWallet[]) => {
+  window.localStorage.setItem(DEV_WALLETS_STORAGE_KEY, JSON.stringify(wallets));
+};
 
 export const useWalletStore = defineStore("wallet", {
   state: () => ({
@@ -12,6 +43,7 @@ export const useWalletStore = defineStore("wallet", {
       ) as Array<EncodedWallet>) || ([] as Array<EncodedWallet>),
     activeWallet: null as Nullable<Wallet>,
     activeClient: null as Nullable<ReturnType<typeof useClient>>,
+    devWallets: readStoredDevWallets(),
     selectedAddress: "",
     authorized: false,
     backupState: true,
@@ -21,6 +53,7 @@ export const useWalletStore = defineStore("wallet", {
     getClient: (state) => state.activeClient,
     getGasPrice: (state) => state.gasPrice,
     getWallet: (state) => state.activeWallet,
+    getDevWallets: (state) => state.devWallets,
     getAddress: (state) => state.selectedAddress,
     getPath: (state) => {
       if (state.activeWallet && state.activeWallet.HDpath) {
@@ -111,6 +144,109 @@ export const useWalletStore = defineStore("wallet", {
         console.error(e);
       }
       this.storeWallets();
+    },
+    async connectWithMnemonic(mnemonic: string, name = "Local Dev Wallet") {
+      const client = useClient();
+      const walletSigner = await DirectSecp256k1HdWallet.fromMnemonic(
+        mnemonic.trim(),
+        { prefix: client.env.prefix ?? "cosmos" }
+      );
+      const [account] = await walletSigner.getAccounts();
+      const wallet: Wallet = {
+        name,
+        mnemonic: null,
+        HDpath: null,
+        password: null,
+        prefix: client.env.prefix ?? "cosmos",
+        pathIncrement: null,
+        accounts: [{ address: account.address, pathIncrement: null }],
+      };
+
+      client.useSigner(walletSigner);
+      this.selectedAddress = account.address;
+      this.activeWallet = wallet;
+      this.activeClient = client;
+      this.authorized = true;
+      const encryptedMnemonic = CryptoJS.AES.encrypt(
+        mnemonic.trim(),
+        getMnemonicStorageKey()
+      ).toString();
+      const storedWallets = this.devWallets.filter(
+        (storedWallet) => storedWallet.address !== account.address
+      );
+      storedWallets.push({
+        name,
+        address: account.address,
+        encryptedMnemonic,
+      });
+      this.devWallets = storedWallets;
+      writeStoredDevWallets(storedWallets);
+      window.localStorage.setItem(DEV_MNEMONIC_STORAGE_KEY, encryptedMnemonic);
+      window.localStorage.setItem(DEV_WALLET_NAME_STORAGE_KEY, name);
+    },
+    async restoreMnemonicWallet() {
+      const storedWallets = this.devWallets;
+      let selectedWallet = storedWallets.find(
+        (storedWallet) =>
+          storedWallet.name === window.localStorage.getItem("lastWallet")
+      );
+
+      const legacyMnemonic = window.localStorage.getItem(
+        DEV_MNEMONIC_STORAGE_KEY
+      );
+      if (!selectedWallet && legacyMnemonic && storedWallets.length === 0) {
+        const mnemonic = CryptoJS.AES.decrypt(
+          legacyMnemonic,
+          getMnemonicStorageKey()
+        ).toString(CryptoJS.enc.Utf8);
+        if (mnemonic) {
+          await this.connectWithMnemonic(
+            mnemonic,
+            window.localStorage.getItem(DEV_WALLET_NAME_STORAGE_KEY) ||
+              "Local Dev Wallet"
+          );
+          selectedWallet = this.devWallets[0];
+        }
+      }
+
+      selectedWallet ||= storedWallets[0];
+      if (!selectedWallet) {
+        return false;
+      }
+
+      const encryptedMnemonic = selectedWallet.encryptedMnemonic;
+      if (!encryptedMnemonic) {
+        return false;
+      }
+
+      const mnemonic = CryptoJS.AES.decrypt(
+        encryptedMnemonic,
+        getMnemonicStorageKey()
+      ).toString(CryptoJS.enc.Utf8);
+      if (!mnemonic) {
+        throw new Error("Saved wallet data is invalid");
+      }
+
+      await this.connectWithMnemonic(mnemonic, selectedWallet.name);
+      return true;
+    },
+    async switchToMnemonicWallet(address: string) {
+      const storedWallet = this.devWallets.find(
+        (wallet) => wallet.address === address
+      );
+      if (!storedWallet) {
+        throw new Error("Wallet not found");
+      }
+
+      const mnemonic = CryptoJS.AES.decrypt(
+        storedWallet.encryptedMnemonic,
+        getMnemonicStorageKey()
+      ).toString(CryptoJS.enc.Utf8);
+      if (!mnemonic) {
+        throw new Error("Saved wallet data is invalid");
+      }
+
+      await this.connectWithMnemonic(mnemonic, storedWallet.name);
     },
     storeWallets() {
       window.localStorage.setItem("wallets", JSON.stringify(this.wallets));
