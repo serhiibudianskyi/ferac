@@ -70,45 +70,6 @@
         <span> Settings </span>
         <IgntChevronRightIcon class="text-sm" />
       </div>
-      <hr class="divide-y my-3 -mx-7" />
-      <a
-        href="#"
-        class="flex justify-between items-center mb-3 cursor-pointer hover:text-gray-660"
-      >
-        <span> Support </span>
-        <IgntExternalArrowIcon class="text-xs" />
-      </a>
-      <a
-        href="#"
-        class="flex justify-between items-center mb-3 cursor-pointer hover:text-gray-660"
-      >
-        <span> Twitter </span>
-        <IgntExternalArrowIcon class="text-xs" />
-      </a>
-      <a
-        href="#"
-        class="flex justify-between items-center mb-3 cursor-pointer hover:text-gray-660"
-      >
-        <span> Telegram </span>
-        <IgntExternalArrowIcon class="text-xs" />
-      </a>
-      <div style="text-align: center; margin-top: 2rem">
-        <a
-          href="#"
-          class="text-sm leading-normal text-gray-660 terms-link mr-2 cursor-pointer"
-          >Privacy</a
-        >•
-        <a
-          href="#"
-          class="text-sm leading-normal text-gray-660 terms-link mr-2 ml-1 cursor-pointer"
-          >Terms of use</a
-        >•
-        <a
-          href="#"
-          class="text-sm leading-normal text-gray-660 terms-link ml-1 cursor-pointer"
-          >Cookies</a
-        >
-      </div>
     </div>
     <div
       v-else-if="showSettings"
@@ -163,7 +124,6 @@
 
 <script setup lang="ts">
 import { IgntChevronRightIcon } from "@ignt/vue-library";
-import { IgntExternalArrowIcon } from "@ignt/vue-library";
 import { IgntProfileIcon } from "@ignt/vue-library";
 import { IgntCopyIcon } from "@ignt/vue-library";
 import {

@@ -12,7 +12,6 @@
               state.tx.receiver.length > 0 && !validReceiver,
           }"
           placeholder="Recipient address"
-          :disabled="!hasAnyBalance"
         />
         <div
           v-if="state.tx.receiver.length > 0 && !validReceiver"
@@ -105,7 +104,7 @@
         v-if="isTxError"
         class="flex items-center justify-center text-xs text-red-500 italic mt-2"
       >
-        Error submitting Tx
+        {{ state.errorMessage || "Error submitting Tx" }}
       </div>
 
       <div
@@ -159,6 +158,7 @@ interface State {
   tx: TxData;
   currentUIState: UI_STATE;
   advancedOpen: boolean;
+  errorMessage: string;
 }
 
 const initialState: State = {
@@ -171,6 +171,7 @@ const initialState: State = {
   },
   currentUIState: UI_STATE.SEND,
   advancedOpen: false,
+  errorMessage: "",
 };
 const state = reactive(initialState);
 const client = useClient();
@@ -185,6 +186,7 @@ const resetTx = (): void => {
   state.tx.memo = "";
   state.tx.ch = "";
   state.tx.fees = [];
+  state.errorMessage = "";
 
   state.currentUIState = UI_STATE.SEND;
 };
@@ -195,6 +197,8 @@ const sendTx = async (): Promise<void> => {
     denom: x.denom,
     amount: x.amount == "" ? "0" : x.amount,
   }));
+  const transactionFee =
+    fee.length > 0 ? fee : [{ amount: "20", denom: "uferac" }];
 
   const amount: Array<Amount> = state.tx.amounts.map((x) => ({
     denom: x.denom,
@@ -231,14 +235,14 @@ const sendTx = async (): Promise<void> => {
       send = () =>
         sendMsgTransfer({
           value: payload,
-          fee: { amount: fee as Readonly<Amount>[], gas: "200000" },
+          fee: { amount: transactionFee as Readonly<Amount>[], gas: "200000" },
           memo,
         });
     } else {
       send = () =>
         sendMsgSend({
           value: payload,
-          fee: { amount: fee as Readonly<Amount[]>, gas: "200000" },
+          fee: { amount: transactionFee as Readonly<Amount[]>, gas: "200000" },
           memo,
         });
     }
@@ -246,7 +250,7 @@ const sendTx = async (): Promise<void> => {
     const txResult = await send();
 
     if (txResult.code) {
-      throw new Error();
+      throw new Error(txResult.rawLog || `Transaction failed with code ${txResult.code}`);
     }
     resetTx();
     state.currentUIState = UI_STATE.TX_SUCCESS;
@@ -255,6 +259,7 @@ const sendTx = async (): Promise<void> => {
     }, 2500);
   } catch (e) {
     console.error(e);
+    state.errorMessage = e instanceof Error ? e.message : "Error submitting Tx";
     state.currentUIState = UI_STATE.TX_ERROR;
   }
 };

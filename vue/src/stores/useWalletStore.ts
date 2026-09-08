@@ -204,7 +204,7 @@ export const useWalletStore = defineStore("wallet", {
       const storedWallets = this.devWallets.filter(
         (storedWallet) => storedWallet.address !== account.address
       );
-      storedWallets.push({
+      storedWallets.unshift({
         name,
         address: account.address,
         encryptedMnemonic,
