@@ -24,7 +24,10 @@ func (app *App) setFeracHandlers() error {
 		return fmt.Errorf("failed to create ante handler: %w", err)
 	}
 
-	validatorPolicy := sdk.ChainAnteDecorators(feracante.NewValidatorPolicyDecorator(app.FeracKeeper))
+	customPolicies := sdk.ChainAnteDecorators(
+		feracante.NewSelfTransferDecorator(),
+		feracante.NewValidatorPolicyDecorator(app.FeracKeeper),
+	)
 
 	app.SetAnteHandler(func(ctx sdk.Context, tx sdk.Tx, simulate bool) (sdk.Context, error) {
 		ctx, err := base(ctx, tx, simulate)
@@ -32,7 +35,7 @@ func (app *App) setFeracHandlers() error {
 			return ctx, err
 		}
 
-		return validatorPolicy(ctx, tx, simulate)
+		return customPolicies(ctx, tx, simulate)
 	})
 
 	app.SetPostHandler(sdk.ChainPostDecorators(feracante.NewNetworkFeeDecorator(app.FeracKeeper)))

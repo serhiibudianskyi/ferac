@@ -187,6 +187,13 @@ const { balances } = useAssets(100);
 const { t } = useLanguage();
 const label = (key: Parameters<typeof t>[0]) => t(key).value;
 
+onMounted(() => {
+  const recipient = new URLSearchParams(window.location.search).get("recipient");
+  if (recipient) {
+    state.tx.receiver = recipient;
+  }
+});
+
 const getBlockHeight = async (): Promise<number> => {
   const response = await fetch(`${env.rpcURL}status`);
   const data = (await response.json()) as {

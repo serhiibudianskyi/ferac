@@ -33,6 +33,16 @@ body,
 	width: 100%;
 }
 
+@layer utilities {
+	@media (min-width: 20rem) and (max-width: 47.99rem) {
+		.container {
+			width: 100%;
+			max-width: 100%;
+			box-sizing: border-box;
+		}
+	}
+}
+
 .transaction-meta > div,
 .transaction-details > div {
 	max-width: 100%;

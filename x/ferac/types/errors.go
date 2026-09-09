@@ -32,4 +32,5 @@ var (
 	ErrMaxSupplyExceeded = errors.Register(ModuleName, 1107, "operation would exceed the immutable max supply")
 	// ErrUnknownRestrictedAccount is returned when querying a non restricted account.
 	ErrUnknownRestrictedAccount = errors.Register(ModuleName, 1108, "account is not subject to transfer restrictions")
+	ErrSelfTransfer = errors.Register(ModuleName, 1109, "cannot send tokens to the same account")
 )

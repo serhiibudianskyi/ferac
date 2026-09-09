@@ -23,7 +23,7 @@
           <div
             class="flex bg-gray-100 align-center items-center justify-center w-full py-10"
           >
-            <IgntQRCode :value="address" color="#000" :width="112" />
+            <IgntQRCode :value="qrValue" color="#000" :width="112" />
           </div>
         </template>
         <template #default>
@@ -44,6 +44,7 @@ import { IgntTabs } from "@ignt/vue-library";
 import { IgntQRCode } from "@ignt/vue-library";
 import { IgntCard } from "@ignt/vue-library";
 import { IgntClipboard } from "@ignt/vue-library";
+import { computed } from "vue";
 
 import { useAddress } from "@/def-composables/useAddress";
 import { useLanguage } from "@/def-composables/useLanguage";
@@ -53,4 +54,9 @@ import IgntSend from "./IgntSend.vue";
 const { address } = useAddress();
 const { locale, t } = useLanguage();
 const label = (key: Parameters<typeof t>[0]) => t(key).value;
+const qrValue = computed(() => {
+  const url = new URL("https://budianskyi-s.com/ferac/");
+  url.searchParams.set("recipient", address.value);
+  return url.toString();
+});
 </script>
