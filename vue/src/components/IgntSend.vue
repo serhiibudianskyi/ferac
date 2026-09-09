@@ -126,7 +126,7 @@ import { IgntChevronDownIcon } from "@ignt/vue-library";
 import { useQueryClient } from "@tanstack/vue-query";
 import BigNumber from "bignumber.js";
 import Long from "long";
-import { computed, reactive, watch } from "vue";
+import { computed, onMounted, reactive, watch } from "vue";
 
 import { useClient } from "@/composables/useClient";
 import { useAddress } from "@/def-composables/useAddress";
