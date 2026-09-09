@@ -46,7 +46,6 @@
           v-if="state.modalPage === 'connect'"
           class="flex items-center flex-col my-3"
         >
-          <IgntKeplrIcon class="text-[48px]" />
           <h3 v-if="isKeplrAvailable" class="text-2xl font-bold">
             Connect your wallet
           </h3>
@@ -72,8 +71,7 @@
               this app.
             </p>
             <p v-else>
-              Connect with a local development mnemonic or install Keplr to use
-              a browser wallet.
+              Connect with a local development mnemonic
             </p>
           </div>
           <div v-else-if="state.modalPage === 'connecting'">
@@ -248,7 +246,7 @@ watch(
   }
 );
 
-const tryToConnectToKeplr = (): void => {
+const tryToConnectToKeplr = async (): Promise<void> => {
   state.modalPage = "connecting";
 
   const onKeplrConnect = async () => {
@@ -260,7 +258,7 @@ const tryToConnectToKeplr = (): void => {
     state.modalPage = "error";
   };
 
-  connectToKeplr(onKeplrConnect, onKeplrError);
+  await connectToKeplr(onKeplrConnect, onKeplrError);
 };
 const tryToConnectWithMnemonic = async (): Promise<void> => {
   try {

@@ -6,6 +6,7 @@ import (
 	"cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
+	distrtypes "github.com/cosmos/cosmos-sdk/x/distribution/types"
 
 	"github.com/serhiibudianskyi/ferac/x/ferac/types"
 )
@@ -47,9 +48,41 @@ func (k Keeper) ChargeNetworkFee(ctx context.Context, payer sdk.AccAddress, amou
 	}
 
 	if validatorPart.IsPositive() {
-		coins := sdk.NewCoins(sdk.NewCoin(params.Denom, validatorPart))
-		if err := k.bankKeeper.SendCoinsFromAccountToModule(ctx, payer, authtypes.FeeCollectorName, coins); err != nil {
-			return err
+		// Reserve 5% of the validator pool for the proposer of this block.
+		// The SDK proposer-reward parameters are deprecated in v0.53, so this
+		// split is applied explicitly before the remaining pool is distributed.
+		proposerPart := validatorPart.MulRaw(5).QuoRaw(100)
+		poolPart := validatorPart.Sub(proposerPart)
+
+		if poolPart.IsPositive() {
+			poolCoins := sdk.NewCoins(sdk.NewCoin(params.Denom, poolPart))
+			if err := k.bankKeeper.SendCoinsFromAccountToModule(ctx, payer, authtypes.FeeCollectorName, poolCoins); err != nil {
+				return err
+			}
+		}
+
+		if proposerPart.IsPositive() {
+			proposer, err := k.stakingKeeper.GetValidatorByConsAddr(
+				ctx,
+				sdk.ConsAddress(sdk.UnwrapSDKContext(ctx).BlockHeader().ProposerAddress),
+			)
+			if err == nil {
+				proposerCoins := sdk.NewCoins(sdk.NewCoin(params.Denom, proposerPart))
+				if err := k.bankKeeper.SendCoinsFromAccountToModule(ctx, payer, authtypes.FeeCollectorName, proposerCoins); err != nil {
+					return err
+				}
+				if err := k.bankKeeper.SendCoinsFromModuleToModule(ctx, authtypes.FeeCollectorName, distrtypes.ModuleName, proposerCoins); err != nil {
+					return err
+				}
+				if err := k.distrKeeper.AllocateTokensToValidator(ctx, proposer, sdk.NewDecCoinsFromCoins(proposerCoins...)); err != nil {
+					return err
+				}
+			} else {
+				poolCoins := sdk.NewCoins(sdk.NewCoin(params.Denom, proposerPart))
+				if err := k.bankKeeper.SendCoinsFromAccountToModule(ctx, payer, authtypes.FeeCollectorName, poolCoins); err != nil {
+					return err
+				}
+			}
 		}
 	}
 

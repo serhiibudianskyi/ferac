@@ -7,3 +7,9 @@ release/
 *.dot
 *.log
 *.ign
+
+feracd
+nohup.out
+*.log
+node_modules/
+dist/

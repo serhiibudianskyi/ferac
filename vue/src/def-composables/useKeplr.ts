@@ -12,7 +12,7 @@ export default function () {
     onErrorCb: () => void
   ) => {
     try {
-      walletStore.connectWithKeplr();
+      await walletStore.connectWithKeplr();
       onSuccessCb();
     } catch (e) {
       console.error(e);

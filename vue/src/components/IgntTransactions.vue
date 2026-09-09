@@ -24,6 +24,12 @@
                 tx.ibc ? "IBC" : ""
               }}</span>
             </div>
+              <div
+                :class="tx.code === 0 ? 'text-green-700' : 'text-red-600'"
+                class="font-medium"
+              >
+                {{ tx.code === 0 ? "Success" : `Failed (code ${tx.code})` }}
+              </div>
             <div class="opacity-60">
               {{ dayjs(tx.timestamp).format("MMMM D YYYY, h:mma") }}
             </div>
@@ -49,6 +55,9 @@
                 from: {{ tx.sender }}
               </template>
               <template v-else> to: {{ tx.receiver }}</template>
+            </div>
+            <div v-if="tx.code !== 0" class="max-w-full text-right text-red-600">
+              {{ tx.rawLog }}
             </div>
           </div>
         </td>
@@ -106,6 +115,8 @@ const normalizeTX = (tx: any) => {
     receiver: "",
     txhash: "",
     timestamp: "",
+    code: 0,
+    rawLog: "",
     type: "",
     amount: [
       {
@@ -132,6 +143,8 @@ const normalizeTX = (tx: any) => {
   }
   normalized.txhash = tx.txhash;
   normalized.timestamp = tx.timestamp;
+  normalized.code = Number(tx.code ?? 0);
+  normalized.rawLog = tx.raw_log ?? "";
   normalized.type = tx.type;
 
   return normalized;

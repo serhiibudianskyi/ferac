@@ -133,6 +133,7 @@ import { useAddress } from "@/def-composables/useAddress";
 import { useAssets } from "@/def-composables/useAssets";
 import { formatDenomAmount } from "@/def-composables/useDenom";
 import type { Amount } from "@/utils/interfaces";
+import { env } from "@/env";
 
 import IgntAmountSelect from "./IgntAmountSelect.vue";
 interface TxData {
@@ -180,10 +181,25 @@ const initialState: State = {
 const state = reactive(initialState);
 const client = useClient();
 const queryClient = useQueryClient();
-const sendMsgSend = client.CosmosBankV_1Beta_1.tx.sendMsgSend;
-const sendMsgTransfer = client.IbcApplicationsTransferV_1.tx.sendMsgTransfer;
 const { address } = useAddress();
 const { balances } = useAssets(100);
+
+const getBlockHeight = async (): Promise<number> => {
+  const response = await fetch(`${env.rpcURL}status`);
+  const data = (await response.json()) as {
+    result?: { sync_info?: { latest_block_height?: string } };
+  };
+  return Number(data.result?.sync_info?.latest_block_height ?? 0);
+};
+
+const waitForNextBlock = async (height: number): Promise<void> => {
+  for (let attempt = 0; attempt < 50; attempt += 1) {
+    if ((await getBlockHeight()) > height) {
+      return;
+    }
+    await new Promise((resolve) => setTimeout(resolve, 200));
+  }
+};
 
 const resetTx = (): void => {
   state.tx.amounts = [];
@@ -238,16 +254,16 @@ const sendTx = async (): Promise<void> => {
       };
 
       send = () =>
-        sendMsgTransfer({
+        client.IbcApplicationsTransferV_1.tx.sendMsgTransfer({
           value: payload,
-          fee: { amount: transactionFee as Readonly<Amount>[], gas: "200000" },
+          fee: { amount: transactionFee as Readonly<Amount>[], gas: "300000" },
           memo,
         });
     } else {
       send = () =>
-        sendMsgSend({
+        client.CosmosBankV_1Beta_1.tx.sendMsgSend({
           value: payload,
-          fee: { amount: transactionFee as Readonly<Amount[]>, gas: "200000" },
+          fee: { amount: transactionFee as Readonly<Amount[]>, gas: "300000" },
           memo,
         });
     }
@@ -259,15 +275,28 @@ const sendTx = async (): Promise<void> => {
     }
     await queryClient.invalidateQueries({
       predicate: ({ queryKey }) => {
-        const queryType = (queryKey[0] as { type?: string })?.type;
+        const queryType =
+          typeof queryKey[0] === "string"
+            ? queryKey[0]
+            : (queryKey[0] as { type?: string })?.type;
         return [
           "ServiceGetTxsEvent",
           "QueryAllBalances",
           "QueryBalance",
           "QuerySpendableBalances",
           "QuerySpendableBalanceByDenom",
+          "validator-commissions",
         ].includes(queryType ?? "");
       },
+    });
+    await queryClient.refetchQueries({
+      queryKey: ["validator-commissions"],
+      type: "active",
+    });
+    await waitForNextBlock(Number(txResult.height));
+    await queryClient.refetchQueries({
+      queryKey: ["validator-commissions"],
+      type: "all",
     });
     resetTx();
     state.currentUIState = UI_STATE.TX_SUCCESS;

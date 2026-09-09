@@ -7,6 +7,10 @@ import { nodePolyfills } from "vite-plugin-node-polyfills";
 import vueDevTools from "vite-plugin-vue-devtools";
 // https://vite.dev/config/
 export default defineConfig({
+  base: "/ferac/",
+  preview: {
+    allowedHosts: ["budianskyi-s.com", "www.budianskyi-s.com"],
+  },
   plugins: [
     nodePolyfills({
       // Whether to polyfill specific globals.

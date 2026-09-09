@@ -103,11 +103,54 @@
         </table>
       </div>
     </section>
+
+    <section class="mt-6 overflow-hidden rounded-xl bg-gray-50 p-6">
+      <h2 class="mb-5 text-xl font-semibold">Validator commissions</h2>
+      <div class="overflow-x-auto">
+        <table class="w-full min-w-[760px] text-left text-sm">
+          <thead class="border-b border-gray-200 text-gray-500">
+            <tr>
+              <th class="pb-3 pr-4 font-normal">Validator</th>
+              <th class="pb-3 pr-4 font-normal">Operator address</th>
+              <th class="pb-3 pr-4 text-right font-normal">Commission</th>
+              <th class="pb-3 pr-4 text-right font-normal">Outstanding rewards</th>
+              <th class="pb-3 text-right font-normal">Total visible rewards</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr
+              v-for="validator in validatorCommissions"
+              :key="validator.operatorAddress"
+              class="border-b border-gray-200 last:border-0"
+            >
+              <td class="py-4 pr-4 font-medium">{{ validator.moniker }}</td>
+              <td class="py-4 pr-4">{{ validator.operatorAddress }}</td>
+              <td class="py-4 pr-4 text-right">
+                {{ formatDenomAmount(validator.commission, "uferac") }} FERAC
+              </td>
+              <td class="py-4 pr-4 text-right">
+                {{ formatDenomAmount(validator.outstanding, "uferac") }} FERAC
+              </td>
+              <td class="py-4 text-right font-medium">
+                {{ formatDenomAmount(validator.total, "uferac") }} FERAC
+              </td>
+            </tr>
+            <tr v-if="!validatorCommissions.length">
+              <td colspan="5" class="py-8 text-center text-gray-500">
+                No validator commissions
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
   </div>
 </template>
 <script setup lang="ts">
 import { computed } from "vue";
+import { useQuery } from "@tanstack/vue-query";
 
+import { useClient } from "@/composables/useClient";
 import useFeracFeracV1 from "@/composables/useFeracFeracV1";
 import { formatDenomAmount } from "@/def-composables/useDenom";
 
@@ -123,4 +166,32 @@ const reserve = computed(() => reserveData.value?.reserve);
 const accounts = computed(
   () => accountsQuery.data.value?.pages.flatMap((page) => page.accounts) ?? []
 );
+const client = useClient();
+const commissionsQuery = useQuery({
+  queryKey: ["validator-commissions"],
+  refetchOnWindowFocus: true,
+  queryFn: async () => {
+    const validators = (await client.CosmosStakingV_1Beta_1.query.queryValidators()).data.validators ?? [];
+
+    return Promise.all(validators.map(async (validator) => {
+      const commission = (await client.CosmosDistributionV_1Beta_1.query.queryValidatorCommission(
+        validator.operator_address ?? ""
+      )).data.commission?.commission?.[0];
+      const outstanding = (await client.CosmosDistributionV_1Beta_1.query.queryValidatorOutstandingRewards(
+        validator.operator_address ?? ""
+      )).data.rewards?.rewards?.[0];
+      const commissionAmount = commission?.amount ?? "0";
+      const outstandingAmount = outstanding?.amount ?? "0";
+
+      return {
+        moniker: validator.description?.moniker ?? validator.operator_address ?? "Unknown",
+        operatorAddress: validator.operator_address ?? "",
+        commission: commissionAmount,
+        outstanding: outstandingAmount,
+        total: (Number(commissionAmount) + Number(outstandingAmount)).toFixed(18),
+      };
+    }));
+  },
+});
+const validatorCommissions = computed(() => commissionsQuery.data.value ?? []);
 </script>

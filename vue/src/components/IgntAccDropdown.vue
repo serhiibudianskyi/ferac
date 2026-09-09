@@ -13,15 +13,26 @@
           <span class="text-[13px] font-bold">
             {{ accName }}
           </span>
-          <span
-            class="text-[13px] leading-normal text-gray-660 copy-address flex items-center"
-            title="Copy address"
-            @click="copy(address)"
-          >
-            {{ shortAddress }}
-            <IgntCopyIcon class="ml-2 cursor-pointer hover:text-black" />
-          </span>
-        </div>
+                    <div class="flex items-center text-[13px] leading-normal text-gray-660">
+            <span
+              class="copy-address cursor-pointer hover:text-black"
+              title="Copy address"
+              @click="copy(address)"
+            >
+              {{ shortAddress }}
+            </span>
+            <button
+              type="button"
+              class="ml-2 cursor-pointer hover:text-black inline-flex items-center p-1"
+              title="Copy address"
+              aria-label="Copy address"
+              @click="copy(address)"
+            >
+              <IgntCopyIcon />
+            </button>
+          </div>
+
+	</div>
       </div>
       <div v-if="devWallets.length > 1" class="mb-4">
         <div class="text-xs text-gray-660 mb-2">Local wallets</div>
@@ -178,7 +189,29 @@ const emit = defineEmits(["disconnect", "close", "select-wallet", "add-wallet"])
 
 // composables
 const { address, shortAddress } = useAddress();
-const { copy } = useClipboard();
+
+const copy = async (text: string) => {
+  try {
+    if (navigator.clipboard && window.isSecureContext) {
+      await navigator.clipboard.writeText(text);
+    } else {
+      const textArea = document.createElement("textarea");
+      textArea.value = text;
+      textArea.style.position = "fixed";
+      textArea.style.left = "-999999px";
+      textArea.style.top = "-999999px";
+      document.body.appendChild(textArea);
+      textArea.focus();
+      textArea.select();
+      document.execCommand("copy");
+      document.body.removeChild(textArea);
+    }
+    // Здесь можно добавить визуальное уведомление, например console.log или тост
+  } catch (err) {
+    console.error("Ошибка копирования:", err);
+  }
+};
+
 
 // computed
 const query = useCosmosBaseTendermintV1Beta1();
