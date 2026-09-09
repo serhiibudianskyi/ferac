@@ -1,0 +1,265 @@
+<template>
+  <transition name="dropdown-fade">
+    <div
+      v-if="showDefault"
+      class="wallet-dropdown top-20 right-8 shadow-std bg-white-1000 rounded absolute max-w-xs p-7 z-50 w-full box-border acc-dd"
+    >
+      <span class="text-sm leading-normal text-gray-660 mb-3 block text-[13px]"
+        >{{ label("connectedWallet") }}</span
+      >
+      <div class="mb-3 flex items-center">
+        <IgntProfileIcon :address="address" />
+        <div class="flex flex-col ml-3">
+          <span class="text-[13px] font-bold">
+            {{ accName }}
+          </span>
+                    <div class="flex items-center text-[13px] leading-normal text-gray-660">
+            <span
+              class="copy-address cursor-pointer hover:text-black"
+              title="Copy address"
+              @click="copy(address)"
+            >
+              {{ shortAddress }}
+            </span>
+            <button
+              type="button"
+              class="ml-2 cursor-pointer hover:text-black inline-flex items-center p-1"
+              title="Copy address"
+              aria-label="Copy address"
+              @click="copy(address)"
+            >
+              <IgntCopyIcon />
+            </button>
+          </div>
+
+	</div>
+      </div>
+      <div v-if="devWallets.length > 1" class="mb-4">
+        <div class="text-xs text-gray-660 mb-2">{{ label("localWallets") }}</div>
+        <div
+          v-for="localWallet in devWallets"
+          :key="localWallet.address"
+          role="button"
+          tabindex="0"
+          class="block w-full text-left py-2 px-3 rounded hover:bg-gray-100"
+          :class="{ 'font-bold bg-gray-100': localWallet.address === address }"
+          @click="selectWallet(localWallet.address)"
+        >
+          <span class="block">{{ localWallet.name }}</span>
+          <span class="flex items-center text-xs text-gray-660">
+            {{ localWallet.address.slice(0, 10) }}...
+            <button
+              type="button"
+              class="ml-2 cursor-pointer hover:text-black"
+              title="Copy wallet address"
+              aria-label="Copy wallet address"
+              @click.stop="copy(localWallet.address)"
+            >
+              <IgntCopyIcon />
+            </button>
+          </span>
+        </div>
+      </div>
+      <div
+        class="flex justify-between items-center cursor-pointer hover:text-gray-660"
+        @click="$emit('add-wallet')"
+      >
+        <span> {{ label("importWallet") }} </span>
+      </div>
+      <hr class="divide-y my-3 -mx-7" />
+      <div
+        class="flex justify-between items-center cursor-pointer hover:text-gray-660"
+        @click="$emit('disconnect')"
+      >
+        <span> {{ label("disconnectWallet") }} </span>
+      </div>
+      <hr class="divide-y my-3 -mx-7" />
+      <div
+        class="flex justify-between items-center cursor-pointer hover:text-gray-660"
+        @click="switchToSettings"
+      >
+        <span> {{ label("settings") }} </span>
+        <IgntChevronRightIcon class="text-sm" />
+      </div>
+    </div>
+    <div
+      v-else-if="showSettings"
+      class="wallet-dropdown top-20 right-8 shadow-std bg-white rounded absolute max-w-xs p-7 z-50 w-full box-border acc-dd"
+    >
+      <header class="flex items-center -mx-7 -mt-7 px-3 pt-3 pb-7">
+        <div class="cursor-pointer" @click="switchToDefault">
+          <svg
+            width="22"
+            height="20"
+            viewBox="0 0 22 20"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M20.5 10L1 10M1 10L9.53125 19M1 10L9.53125 1"
+              stroke="black"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+        </div>
+        <div class="text-xl font-semibold text-center flex-1">{{ label("settings") }}</div>
+      </header>
+
+      <div class="flex justify-between items-center mb-3">
+        <span> Chain </span>
+        <span> {{ chainId }} </span>
+      </div>
+      <hr class="divide-y -mx-7 my-3" />
+
+      <div class="flex justify-between items-center mb-3">
+        <span> Cosmos SDK API </span>
+        <span> {{ apiConnected ? "connected" : "disconnected" }} </span>
+      </div>
+      <hr class="divide-y -mx-7 my-3" />
+
+      <div class="flex justify-between items-center mb-3">
+        <span> Tendermint RPC </span>
+        <span> {{ rpcConnected ? "connected" : "disconnected" }} </span>
+      </div>
+      <hr class="divide-y -mx-7 my-3" />
+
+      <div class="flex justify-between items-center">
+        <span> WebSocket </span>
+        <span> {{ wsConnected ? "connected" : "disconnected" }} </span>
+      </div>
+    </div>
+  </transition>
+</template>
+
+<script setup lang="ts">
+import { IgntChevronRightIcon } from "@ignt/vue-library";
+import { IgntProfileIcon } from "@ignt/vue-library";
+import { IgntCopyIcon } from "@ignt/vue-library";
+import {
+  computed,
+  onBeforeUnmount,
+  onMounted,
+  reactive,
+  type PropType,
+} from "vue";
+
+import useCosmosBaseTendermintV1Beta1 from "@/composables/useCosmosBaseTendermintV1Beta1";
+import { useConnectionStatus } from "@/def-composables/useConnectionStatus";
+import { useLanguage } from "@/def-composables/useLanguage";
+
+import { useAddress } from "../def-composables/useAddress";
+import { useClipboard } from "../def-composables/useClipboard";
+
+enum UI_STATE {
+  DEFAULT = 1,
+
+  SETTINGS = 2,
+}
+
+interface LocalWallet {
+  name: string;
+  address: string;
+}
+
+interface State {
+  currentUIState: UI_STATE;
+}
+
+const initialState: State = {
+  currentUIState: UI_STATE.DEFAULT,
+};
+
+defineProps({
+  wallet: {
+    type: Object,
+    required: true,
+  },
+
+  accName: {
+    type: String,
+    required: true,
+  },
+  devWallets: {
+    type: Array as PropType<LocalWallet[]>,
+    default: () => [],
+  },
+});
+const emit = defineEmits(["disconnect", "close", "select-wallet", "add-wallet"]);
+
+// composables
+const { address, shortAddress } = useAddress();
+const { t } = useLanguage();
+const label = (key: Parameters<typeof t>[0]) => t(key).value;
+
+const copy = async (text: string) => {
+  try {
+    if (navigator.clipboard && window.isSecureContext) {
+      await navigator.clipboard.writeText(text);
+    } else {
+      const textArea = document.createElement("textarea");
+      textArea.value = text;
+      textArea.style.position = "fixed";
+      textArea.style.left = "-999999px";
+      textArea.style.top = "-999999px";
+      document.body.appendChild(textArea);
+      textArea.focus();
+      textArea.select();
+      document.execCommand("copy");
+      document.body.removeChild(textArea);
+    }
+    // Здесь можно добавить визуальное уведомление, например console.log или тост
+  } catch (err) {
+    console.error("Ошибка копирования:", err);
+  }
+};
+
+
+// computed
+const query = useCosmosBaseTendermintV1Beta1();
+const nodeInfo = query.ServiceGetNodeInfo({});
+const chainId = computed(
+  () => nodeInfo.data?.value?.default_node_info?.network ?? ""
+);
+const { apiConnected, rpcConnected, wsConnected } = useConnectionStatus();
+const showDefault = computed<boolean>(
+  () => state.currentUIState === UI_STATE.DEFAULT
+);
+const showSettings = computed<boolean>(
+  () => state.currentUIState === UI_STATE.SETTINGS
+);
+
+// state
+const state: State = reactive(initialState);
+
+// methods
+const clickOutsideHandler = (evt: MouseEvent) => {
+  const dropdownEl = document.querySelector(".acc-dd");
+  const dropdownButtonEl = document.querySelector(".acc-dd-btn");
+  if (
+    !dropdownEl?.contains(evt.target as Node) &&
+    !dropdownButtonEl?.contains(evt.target as Node)
+  ) {
+    emit("close");
+    state.currentUIState = UI_STATE.DEFAULT;
+  }
+};
+const switchToSettings = () => {
+  state.currentUIState = UI_STATE.SETTINGS;
+};
+const switchToDefault = () => {
+  state.currentUIState = UI_STATE.DEFAULT;
+};
+const selectWallet = (address: string) => {
+  emit("select-wallet", address);
+};
+
+// lh
+onMounted(() => {
+  document.addEventListener("click", clickOutsideHandler);
+});
+onBeforeUnmount(() => {
+  document.removeEventListener("click", clickOutsideHandler);
+});
+</script>

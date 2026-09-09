@@ -1,0 +1,95 @@
+syntax = "proto3";
+package ferac.ferac.v1;
+
+import "cosmos_proto/cosmos.proto";
+import "gogoproto/gogo.proto";
+
+option go_package = "github.com/serhiibudianskyi/ferac/x/ferac/types";
+
+// AllocationCategory enumerates the genesis distribution buckets.
+enum AllocationCategory {
+  option (gogoproto.goproto_enum_prefix) = false;
+
+  ALLOCATION_CATEGORY_UNSPECIFIED = 0;
+  ALLOCATION_CATEGORY_CREATOR = 1;
+  ALLOCATION_CATEGORY_TEAM = 2;
+  ALLOCATION_CATEGORY_VALIDATOR_RESERVE = 3;
+  ALLOCATION_CATEGORY_COMMUNITY = 4;
+  ALLOCATION_CATEGORY_DEX_LIQUIDITY = 5;
+  ALLOCATION_CATEGORY_TREASURY = 6;
+  ALLOCATION_CATEGORY_ECOSYSTEM = 7;
+}
+
+// RestrictedAccount tracks the 25%-of-remaining / 12-month transfer limit that
+// applies to the creator and team allocations.
+message RestrictedAccount {
+  string address = 1 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+
+  AllocationCategory category = 2;
+
+  // remaining is the amount still under restriction.
+  string remaining = 3 [
+    (cosmos_proto.scalar) = "cosmos.Int",
+    (gogoproto.customtype) = "cosmossdk.io/math.Int",
+    (gogoproto.nullable) = false
+  ];
+
+  // period_limit is 25% of `remaining` measured at the start of the period.
+  string period_limit = 4 [
+    (cosmos_proto.scalar) = "cosmos.Int",
+    (gogoproto.customtype) = "cosmossdk.io/math.Int",
+    (gogoproto.nullable) = false
+  ];
+
+  // released is how much of period_limit has already been transferred out in
+  // the current period. Unused limit never carries over.
+  string released = 5 [
+    (cosmos_proto.scalar) = "cosmos.Int",
+    (gogoproto.customtype) = "cosmossdk.io/math.Int",
+    (gogoproto.nullable) = false
+  ];
+
+  // period_start is the unix time the current 12-month period began.
+  int64 period_start = 6;
+}
+
+// ValidatorReserve holds the state of the 4% validator reserve that pays out
+// 5% of its *remaining* balance every 12 months.
+message ValidatorReserve {
+  string remaining = 1 [
+    (cosmos_proto.scalar) = "cosmos.Int",
+    (gogoproto.customtype) = "cosmossdk.io/math.Int",
+    (gogoproto.nullable) = false
+  ];
+
+  // last_epoch_time is the unix time of the last reserve release.
+  int64 last_epoch_time = 2;
+
+  // epoch counts completed reserve releases.
+  uint64 epoch = 3;
+}
+
+// ValidatorPerformance accumulates the uptime and quality inputs of the
+// 40/40/20 reward formula.
+message ValidatorPerformance {
+  string validator_address = 1 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+
+  // signed_blocks and total_blocks are counted over the current reserve epoch.
+  uint64 signed_blocks = 2;
+  uint64 total_blocks = 3;
+
+  // quality_score is a governance-set score in [0,1].
+  string quality_score = 4 [
+    (cosmos_proto.scalar) = "cosmos.Dec",
+    (gogoproto.customtype) = "cosmossdk.io/math.LegacyDec",
+    (gogoproto.nullable) = false
+  ];
+}
+
+// ValidatorExit records a validator exit announcement. A validator may only
+// self-undelegate after the notice period has elapsed.
+message ValidatorExit {
+  string validator_address = 1 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+  int64 announced_at = 2;
+  int64 allowed_at = 3;
+}

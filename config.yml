@@ -1,27 +1,333 @@
-version: 1
 validation: sovereign
-default_denom: stake
-accounts: 
-- name: alice
-  coins:
-  - 20000token
-  - 200000000stake
-- name: bob
-  coins:
-  - 10000token
-  - 100000000stake
+version: 1
+accounts:
+    - name: creator
+      coins:
+        - 8888888800000uferac
+      mnemonic: absurd amount doctor acoustic avoid letter advice cage absurd amount doctor acoustic avoid letter advice cage absurd amount doctor acoustic avoid letter advice comic
+    - name: team
+      coins:
+        - 2666666640000uferac
+      mnemonic: acoustic avoid letter advice cage absurd amount doctor acoustic avoid letter advice cage absurd amount doctor acoustic avoid letter advice cage absurd amount exchange
+    - name: validator_reserve
+      coins:
+        - 3555555520000uferac
+      mnemonic: adapt blossom school alcohol coral light army gather adapt blossom school alcohol coral light army gather adapt blossom school alcohol coral light army hold
+    - name: community
+      coins:
+        - 23111110800000uferac
+      mnemonic: advice cage absurd amount doctor acoustic avoid letter advice cage absurd amount doctor acoustic avoid letter advice cage absurd amount doctor acoustic avoid negative
+    - name: dex_liquidity
+      coins:
+        - 17777777600000uferac
+      mnemonic: agree choice donor anxiety expect little beef pass agree choice donor anxiety expect little beef pass agree choice donor anxiety expect little beef sample
+    - name: treasury
+      coins:
+        - 13333333200000uferac
+      mnemonic: alcohol coral light army gather adapt blossom school alcohol coral light army gather adapt blossom school alcohol coral light army gather adapt blossom tackle
+    - name: ecosystem
+      coins:
+        - 11555555440000uferac
+      mnemonic: alpha deal scrub asthma idea logic bright thought alpha deal scrub asthma idea logic bright thought alpha deal scrub asthma idea logic bright truly
+    - name: val1
+      coins:
+        - 2000000000000uferac
+      mnemonic: amount doctor acoustic avoid letter advice cage absurd amount doctor acoustic avoid letter advice cage absurd amount doctor acoustic avoid letter advice cage again
+    - name: val2
+      coins:
+        - 2000000000000uferac
+      mnemonic: animal embark drastic bamboo mountain loyal category cancel animal embark drastic bamboo mountain loyal category cancel animal embark drastic bamboo mountain loyal category cover
+    - name: val3
+      coins:
+        - 2000000000000uferac
+      mnemonic: anxiety expect little beef pass agree choice donor anxiety expect little beef pass agree choice donor anxiety expect little beef pass agree choice fire
+    - name: val4
+      coins:
+        - 2000000000000uferac
+      mnemonic: arch flame security bid radar machine club gesture arch flame security bid radar machine club gesture arch flame security bid radar machine club lawn
 client:
-  openapi:
-    path: docs/static/openapi.json
-faucet:
-  name: bob
-  coins:
-  - 5token
-  - 100000stake
+    typescript:
+        path: ts-client
+    openapi:
+        path: docs/static/openapi.json
+        exclude_list: []
+genesis:
+    app_state:
+        bank:
+            denom_metadata:
+                - base: uferac
+                  denom_units:
+                    - denom: uferac
+                      exponent: 0
+                    - denom: FERAC
+                      exponent: 6
+                  description: FOREVERGALACTIC
+                  display: FERAC
+                  name: FOREVERGALACTIC
+                  symbol: FERAC
+        distribution:
+            params:
+                community_tax: "0.000000000000000000"
+                base_proposer_reward: "0.040000000000000000"
+                bonus_proposer_reward: "0.010000000000000000"
+                withdraw_addr_enabled: true
+        ferac:
+            params:
+                denom: uferac
+                dex_fee_rate: "0.000200000000000000"
+                genesis_finality_threshold: 3
+                genesis_validator_count: 4
+                max_supply: "88888888000000"
+                max_validator_stake_share: "0.200000000000000000"
+                max_validators_per_operator: 1
+                min_self_delegation: "1000000000"
+                network_fee_rate: "0.000100000000000000"
+                network_fee_validator_share: "0.500000000000000000"
+                quality_weight: "0.200000000000000000"
+                reserve_period_seconds: "31536000"
+                reserve_release_rate: "0.050000000000000000"
+                restricted_period_seconds: "31536000"
+                restricted_release_rate: "0.250000000000000000"
+                stake_weight: "0.400000000000000000"
+                supermajority_threshold: "0.666666666666666667"
+                treasury_address: f8-1lgdhj06gwvn0469jscassquv8rcf2pyyeqqk08
+                uptime_weight: "0.400000000000000000"
+                validator_commission_rate: "0.050000000000000000"
+                validator_unbonding_seconds: "1209600"
+            performances: []
+            reserve_funder: f8-16rrc44wwf62n5qf28f9mjghqy0y3jdcyssqqsj
+            restricted_accounts:
+                - address: f8-1v4d0dhfljhmwnpgtuwene4txqceat2w20zt8h3
+                  category: ALLOCATION_CATEGORY_CREATOR
+                  period_limit: "2222222200000"
+                  period_start: "0"
+                  released: "0"
+                  remaining: "8888888800000"
+                - address: f8-1m7cltwrw2n2ljqn7ajukzv4ezfdxluled32zun
+                  category: ALLOCATION_CATEGORY_TEAM
+                  period_limit: "666666660000"
+                  period_start: "0"
+                  released: "0"
+                  remaining: "2666666640000"
+            validator_reserve:
+                epoch: "0"
+                last_epoch_time: "0"
+                remaining: "3555555520000"
+        gov:
+            params:
+                burn_proposal_deposit_prevote: false
+                burn_vote_quorum: false
+                burn_vote_veto: true
+                expedited_min_deposit:
+                    - amount: "50000000000"
+                      denom: uferac
+                expedited_threshold: "0.750000000000000000"
+                expedited_voting_period: 86400s
+                max_deposit_period: 172800s
+                min_deposit:
+                    - amount: "10000000000"
+                      denom: uferac
+                quorum: "0.334000000000000000"
+                threshold: "0.700000000000000000"
+                veto_threshold: "0.334000000000000000"
+                voting_period: 604800s
+        mint:
+            minter:
+                annual_provisions: "0.000000000000000000"
+                inflation: "0.000000000000000000"
+            params:
+                blocks_per_year: "3942000"
+                goal_bonded: "0.670000000000000000"
+                inflation_max: "0.000000000000000000"
+                inflation_min: "0.000000000000000000"
+                inflation_rate_change: "0.000000000000000000"
+                mint_denom: uferac
+        slashing:
+            params:
+                downtime_jail_duration: 600s
+                min_signed_per_window: "0.500000000000000000"
+                signed_blocks_window: "10000"
+                slash_fraction_double_sign: "0.250000000000000000"
+                slash_fraction_downtime: "0.500000000000000000"
+        staking:
+            params:
+                bond_denom: uferac
+                historical_entries: 10000
+                max_entries: 7
+                max_validators: 100
+                unbonding_time: 1800s
+    consensus:
+        params:
+            block:
+                max_bytes: "22020096"
+                max_gas: "400000000"
+default_denom: uferac
 validators:
-- name: alice
-  bonded: 100000000stake
-- name: validator1
-  bonded: 200000000stake
-- name: validator2
-  bonded: 100000000stake
+    - name: val1
+      bonded: 1000000000000uferac
+      config:
+        consensus:
+            timeout_commit: 8s
+            timeout_propose: 3s
+      gentx:
+        amount: ""
+        moniker: ""
+        keyring-backend: ""
+        chain-id: ""
+        commission-max-change-rate: "0.00"
+        commission-max-rate: "0.05"
+        commission-rate: "0.05"
+        details: ""
+        security-contact: ""
+        website: ""
+        account-number: 0
+        broadcast-mode: ""
+        dry-run: false
+        fee-account: ""
+        fee: ""
+        from: ""
+        gas: ""
+        gas-adjustment: ""
+        gas-prices: ""
+        generate-only: false
+        identity: ""
+        ip: ""
+        keyring-dir: ""
+        ledger: false
+        min-self-delegation: "1000000000"
+        node: ""
+        node-id: ""
+        note: ""
+        offline: false
+        output: ""
+        output-document: ""
+        pubkey: ""
+        sequence: 0
+        sign-mode: ""
+        timeout-height: 0
+    - name: val2
+      bonded: 1000000000000uferac
+      config:
+        consensus:
+            timeout_commit: 8s
+            timeout_propose: 3s
+      gentx:
+        amount: ""
+        moniker: ""
+        keyring-backend: ""
+        chain-id: ""
+        commission-max-change-rate: "0.00"
+        commission-max-rate: "0.05"
+        commission-rate: "0.05"
+        details: ""
+        security-contact: ""
+        website: ""
+        account-number: 0
+        broadcast-mode: ""
+        dry-run: false
+        fee-account: ""
+        fee: ""
+        from: ""
+        gas: ""
+        gas-adjustment: ""
+        gas-prices: ""
+        generate-only: false
+        identity: ""
+        ip: ""
+        keyring-dir: ""
+        ledger: false
+        min-self-delegation: "1000000000"
+        node: ""
+        node-id: ""
+        note: ""
+        offline: false
+        output: ""
+        output-document: ""
+        pubkey: ""
+        sequence: 0
+        sign-mode: ""
+        timeout-height: 0
+    - name: val3
+      bonded: 1000000000000uferac
+      config:
+        consensus:
+            timeout_commit: 8s
+            timeout_propose: 3s
+      gentx:
+        amount: ""
+        moniker: ""
+        keyring-backend: ""
+        chain-id: ""
+        commission-max-change-rate: "0.00"
+        commission-max-rate: "0.05"
+        commission-rate: "0.05"
+        details: ""
+        security-contact: ""
+        website: ""
+        account-number: 0
+        broadcast-mode: ""
+        dry-run: false
+        fee-account: ""
+        fee: ""
+        from: ""
+        gas: ""
+        gas-adjustment: ""
+        gas-prices: ""
+        generate-only: false
+        identity: ""
+        ip: ""
+        keyring-dir: ""
+        ledger: false
+        min-self-delegation: "1000000000"
+        node: ""
+        node-id: ""
+        note: ""
+        offline: false
+        output: ""
+        output-document: ""
+        pubkey: ""
+        sequence: 0
+        sign-mode: ""
+        timeout-height: 0
+    - name: val4
+      bonded: 1000000000000uferac
+      config:
+        consensus:
+            timeout_commit: 8s
+            timeout_propose: 3s
+      gentx:
+        amount: ""
+        moniker: ""
+        keyring-backend: ""
+        chain-id: ""
+        commission-max-change-rate: "0.00"
+        commission-max-rate: "0.05"
+        commission-rate: "0.05"
+        details: ""
+        security-contact: ""
+        website: ""
+        account-number: 0
+        broadcast-mode: ""
+        dry-run: false
+        fee-account: ""
+        fee: ""
+        from: ""
+        gas: ""
+        gas-adjustment: ""
+        gas-prices: ""
+        generate-only: false
+        identity: ""
+        ip: ""
+        keyring-dir: ""
+        ledger: false
+        min-self-delegation: "1000000000"
+        node: ""
+        node-id: ""
+        note: ""
+        offline: false
+        output: ""
+        output-document: ""
+        pubkey: ""
+        sequence: 0
+        sign-mode: ""
+        timeout-height: 0

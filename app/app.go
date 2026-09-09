@@ -9,6 +9,7 @@ import (
 	"cosmossdk.io/log"
 	storetypes "cosmossdk.io/store/types"
 	circuitkeeper "cosmossdk.io/x/circuit/keeper"
+	feegrantkeeper "cosmossdk.io/x/feegrant/keeper"
 	upgradekeeper "cosmossdk.io/x/upgrade/keeper"
 
 	abci "github.com/cometbft/cometbft/abci/types"
@@ -53,7 +54,7 @@ const (
 	// Name is the name of the application.
 	Name = "ferac"
 	// AccountAddressPrefix is the prefix for accounts addresses.
-	AccountAddressPrefix = "cosmos"
+	AccountAddressPrefix = "f8-"
 	// ChainCoinType is the coin type of the chain.
 	ChainCoinType = 118
 )
@@ -91,6 +92,7 @@ type App struct {
 	ConsensusParamsKeeper consensuskeeper.Keeper
 	CircuitBreakerKeeper  circuitkeeper.Keeper
 	ParamsKeeper          paramskeeper.Keeper
+	FeeGrantKeeper        feegrantkeeper.Keeper
 
 	// ibc keepers
 	IBCKeeper           *ibckeeper.Keeper
@@ -180,6 +182,7 @@ func New(
 		&app.ConsensusParamsKeeper,
 		&app.CircuitBreakerKeeper,
 		&app.ParamsKeeper,
+		&app.FeeGrantKeeper,
 		&app.FeracKeeper,
 	); err != nil {
 		panic(err)
@@ -194,6 +197,14 @@ func New(
 
 	// register legacy modules
 	if err := app.registerIBCModules(appOpts); err != nil {
+		panic(err)
+	}
+
+	// Enforce the creator/team 25%-of-remaining transfer limit on every bank
+	// transfer path.
+	app.BankKeeper.AppendSendRestriction(app.FeracKeeper.SendRestrictionFn)
+
+	if err := app.setFeracHandlers(); err != nil {
 		panic(err)
 	}
 

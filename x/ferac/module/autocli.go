@@ -17,6 +17,28 @@ func (am AppModule) AutoCLIOptions() *autocliv1.ModuleOptions {
 					Use:       "params",
 					Short:     "Shows the parameters of the module",
 				},
+				{
+					RpcMethod: "ValidatorReserve",
+					Use:       "validator-reserve",
+					Short:     "Shows the remaining validator reserve and the next yearly release",
+				},
+				{
+					RpcMethod:      "RestrictedAccount",
+					Use:            "restricted-account [address]",
+					Short:          "Shows the creator/team transfer limit state of an account",
+					PositionalArgs: []*autocliv1.PositionalArgDescriptor{{ProtoField: "address"}},
+				},
+				{
+					RpcMethod: "RestrictedAccounts",
+					Use:       "restricted-accounts",
+					Short:     "Lists all accounts subject to transfer restrictions",
+				},
+				{
+					RpcMethod:      "ValidatorPerformance",
+					Use:            "validator-performance [validator-address]",
+					Short:          "Shows the uptime and quality counters of a validator",
+					PositionalArgs: []*autocliv1.PositionalArgDescriptor{{ProtoField: "validator_address"}},
+				},
 			},
 		},
 		Tx: &autocliv1.ServiceCommandDescriptor{
@@ -26,6 +48,16 @@ func (am AppModule) AutoCLIOptions() *autocliv1.ModuleOptions {
 				{
 					RpcMethod: "UpdateParams",
 					Skip:      true, // skipped because authority gated
+				},
+				{
+					RpcMethod: "SetValidatorQuality",
+					Skip:      true, // skipped because authority gated
+				},
+				{
+					RpcMethod:      "AnnounceValidatorExit",
+					Use:            "announce-validator-exit [validator-address]",
+					Short:          "Starts the 14 day validator exit notice period",
+					PositionalArgs: []*autocliv1.PositionalArgDescriptor{{ProtoField: "validator_address"}},
 				},
 			},
 		},

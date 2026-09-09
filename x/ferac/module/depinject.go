@@ -8,6 +8,8 @@ import (
 	"cosmossdk.io/depinject/appconfig"
 	"github.com/cosmos/cosmos-sdk/codec"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
+	distrkeeper "github.com/cosmos/cosmos-sdk/x/distribution/keeper"
+	stakingkeeper "github.com/cosmos/cosmos-sdk/x/staking/keeper"
 
 	"github.com/serhiibudianskyi/ferac/x/ferac/keeper"
 	"github.com/serhiibudianskyi/ferac/x/ferac/types"
@@ -33,8 +35,10 @@ type ModuleInputs struct {
 	Cdc          codec.Codec
 	AddressCodec address.Codec
 
-	AuthKeeper types.AuthKeeper
-	BankKeeper types.BankKeeper
+	AuthKeeper    types.AuthKeeper
+	BankKeeper    types.BankKeeper
+	StakingKeeper *stakingkeeper.Keeper
+	DistrKeeper   distrkeeper.Keeper
 }
 
 type ModuleOutputs struct {
@@ -55,6 +59,10 @@ func ProvideModule(in ModuleInputs) ModuleOutputs {
 		in.Cdc,
 		in.AddressCodec,
 		authority,
+		in.AuthKeeper,
+		in.BankKeeper,
+		in.StakingKeeper,
+		in.DistrKeeper,
 	)
 	m := NewAppModule(in.Cdc, k, in.AuthKeeper, in.BankKeeper)
 

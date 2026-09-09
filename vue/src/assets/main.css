@@ -1,0 +1,200 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap');
+@import "tailwindcss";
+@config "../../tailwind.config.js";
+
+html,
+body,
+#app {
+	max-width: 100%;
+	overflow-x: hidden;
+	overflow-y: auto;
+}
+
+.wallet-dropdown {
+	max-height: calc(100vh - 6rem);
+	overflow-y: auto;
+}
+
+.transaction-row {
+	display: grid;
+	grid-template-columns: auto minmax(0, 1fr) minmax(0, 1fr);
+	width: 100%;
+	align-items: start;
+}
+
+.transaction-meta,
+.transaction-details {
+	min-width: 0;
+	overflow: hidden;
+}
+
+.transaction-details {
+	max-width: 100%;
+	width: 100%;
+}
+
+@layer utilities {
+	@media (min-width: 20rem) and (max-width: 47.99rem) {
+		.container {
+			width: 100%;
+			max-width: 100%;
+			box-sizing: border-box;
+		}
+	}
+}
+
+.transaction-meta > div,
+.transaction-details > div {
+	max-width: 100%;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+@media (max-width: 900px) {
+	.site-header {
+		padding-bottom: 0.75rem;
+	}
+
+	.header-nav {
+		gap: 0.25rem;
+	}
+
+	.header-links {
+		overflow-x: auto;
+		scrollbar-width: none;
+	}
+
+	.header-links::-webkit-scrollbar {
+		display: none;
+	}
+
+	.header-links li {
+		flex: 0 0 auto;
+	}
+
+	.transaction-row {
+		grid-template-columns: auto minmax(0, 1fr);
+		column-gap: 0.5rem;
+		row-gap: 0;
+	}
+
+	.transaction-row > div:first-child {
+		width: 2rem;
+		height: 2rem;
+		margin-right: 0;
+		font-size: 1.25rem;
+	}
+
+	.transaction-row > .transaction-meta {
+		grid-column: 2;
+		grid-row: 1;
+	}
+
+	.transaction-meta,
+	.transaction-details {
+		overflow: hidden;
+	}
+
+	.transaction-meta > div,
+	.transaction-details > div {
+		max-width: 100%;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+
+	.transaction-details {
+		grid-column: 2;
+		grid-row: 2;
+		max-width: 100%;
+		width: 100%;
+		align-items: flex-start;
+		margin-top: 0;
+		line-height: 1.25;
+	}
+
+	.transaction-meta,
+	.transaction-details {
+		line-height: 1.25;
+	}
+
+	.transaction-details .bg-green-200,
+	.transaction-details .bg-red-200 {
+		display: inline-block;
+		max-width: 100%;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+
+	.transfer-panel {
+		width: 100%;
+		min-width: 0;
+	}
+
+	.transfer-panel h2 {
+		font-size: 1.5rem;
+		line-height: 1.2;
+	}
+
+	.transfer-panel .text-3xl {
+		font-size: 1.5rem;
+		line-height: 1.2;
+	}
+
+	.asset-search {
+		width: min(11rem, calc(100vw - 7rem));
+	}
+
+	.asset-table {
+		font-size: 0.875rem;
+	}
+
+	.asset-table td:first-child {
+		white-space: nowrap;
+	}
+
+	.asset-table td:first-child .mr-6 {
+		margin-right: 0.5rem;
+	}
+
+	.asset-table td:last-child {
+		font-size: 0.95rem;
+		white-space: nowrap;
+	}
+
+	.sp-acc {
+		position: static;
+	}
+
+	.sp-acc .acc-dd-btn {
+		max-width: calc(100vw - 2rem);
+		margin-right: 0;
+		padding: 0.625rem 0.75rem;
+	}
+
+	.sp-acc .acc-dd-btn span {
+		max-width: 8rem;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+
+	.wallet-dropdown {
+		position: fixed;
+		top: 4.5rem;
+		right: 0.75rem;
+		left: 0.75rem;
+		width: auto;
+		max-width: none;
+		max-height: calc(100vh - 5.25rem);
+		padding: 1rem;
+		border-radius: 1rem;
+	}
+
+	.wallet-dropdown hr {
+		margin-left: -1rem;
+		margin-right: -1rem;
+	}
+}
