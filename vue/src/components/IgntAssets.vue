@@ -17,7 +17,7 @@
           type="search"
           autocomplete="off"
           :placeholder="label('searchAssets')"
-          class="asset-search w-48 -ml-8 pl-10 pr-10 leading-12 h-12 appearance-none outline-none border-none rounded-xl focus:shadow-outline"
+          class="asset-search w-48 -ml-8 pl-10 pr-4 leading-12 h-12 appearance-none outline-none border-none rounded-xl focus:shadow-outline"
           @input="(evt: Event) => {
             resetDisplayLimit();
             return evt;
@@ -25,7 +25,7 @@
         />
         <div
           v-if="searchQuery"
-          class="z-50 absolute mr-4"
+          class="z-50 absolute mr-2"
           @click.prevent="resetSearch"
         >
           <IgntClearIcon />
