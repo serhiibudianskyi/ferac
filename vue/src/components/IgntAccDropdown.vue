@@ -5,7 +5,7 @@
       class="wallet-dropdown top-20 right-8 shadow-std bg-white-1000 rounded absolute max-w-xs p-7 z-50 w-full box-border acc-dd"
     >
       <span class="text-sm leading-normal text-gray-660 mb-3 block text-[13px]"
-        >Connected wallet</span
+        >{{ label("connectedWallet") }}</span
       >
       <div class="mb-3 flex items-center">
         <IgntProfileIcon :address="address" />
@@ -35,7 +35,7 @@
 	</div>
       </div>
       <div v-if="devWallets.length > 1" class="mb-4">
-        <div class="text-xs text-gray-660 mb-2">Local wallets</div>
+        <div class="text-xs text-gray-660 mb-2">{{ label("localWallets") }}</div>
         <div
           v-for="localWallet in devWallets"
           :key="localWallet.address"
@@ -64,21 +64,21 @@
         class="flex justify-between items-center cursor-pointer hover:text-gray-660"
         @click="$emit('add-wallet')"
       >
-        <span> Import another wallet </span>
+        <span> {{ label("importWallet") }} </span>
       </div>
       <hr class="divide-y my-3 -mx-7" />
       <div
         class="flex justify-between items-center cursor-pointer hover:text-gray-660"
         @click="$emit('disconnect')"
       >
-        <span> Disconnect wallet </span>
+        <span> {{ label("disconnectWallet") }} </span>
       </div>
       <hr class="divide-y my-3 -mx-7" />
       <div
         class="flex justify-between items-center cursor-pointer hover:text-gray-660"
         @click="switchToSettings"
       >
-        <span> Settings </span>
+        <span> {{ label("settings") }} </span>
         <IgntChevronRightIcon class="text-sm" />
       </div>
     </div>
@@ -104,7 +104,7 @@
             />
           </svg>
         </div>
-        <div class="text-xl font-semibold text-center flex-1">Settings</div>
+        <div class="text-xl font-semibold text-center flex-1">{{ label("settings") }}</div>
       </header>
 
       <div class="flex justify-between items-center mb-3">
@@ -147,6 +147,7 @@ import {
 
 import useCosmosBaseTendermintV1Beta1 from "@/composables/useCosmosBaseTendermintV1Beta1";
 import { useConnectionStatus } from "@/def-composables/useConnectionStatus";
+import { useLanguage } from "@/def-composables/useLanguage";
 
 import { useAddress } from "../def-composables/useAddress";
 import { useClipboard } from "../def-composables/useClipboard";
@@ -189,6 +190,8 @@ const emit = defineEmits(["disconnect", "close", "select-wallet", "add-wallet"])
 
 // composables
 const { address, shortAddress } = useAddress();
+const { t } = useLanguage();
+const label = (key: Parameters<typeof t>[0]) => t(key).value;
 
 const copy = async (text: string) => {
   try {

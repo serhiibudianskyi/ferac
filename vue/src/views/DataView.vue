@@ -1,82 +1,82 @@
 <template>
   <div class="container mx-auto px-4 py-10 sm:px-6">
     <header class="mb-8">
-      <h1 class="text-4xl font-semibold">Network data</h1>
+      <h1 class="text-4xl font-semibold">{{ label("networkData") }}</h1>
       <p class="mt-2 text-sm text-gray-600">
-        Live tokenomics and allocation state from the Ferac chain.
+        {{ label("liveTokenomics") }}
       </p>
     </header>
 
     <div class="grid gap-6 lg:grid-cols-2">
       <section class="rounded-xl bg-gray-50 p-6">
-        <h2 class="mb-5 text-xl font-semibold">Tokenomics</h2>
-        <dl class="grid grid-cols-2 gap-x-6 gap-y-4 text-sm">
-          <div>
-            <dt class="text-gray-500">Denom</dt>
-            <dd class="mt-1 font-medium">{{ params?.denom ?? "-" }}</dd>
+        <h2 class="mb-5 text-xl font-semibold">{{ label("tokenomics") }}</h2>
+        <dl class="grid grid-cols-1 gap-y-4 text-sm sm:grid-cols-2 sm:gap-x-6">
+          <div class="min-w-0">
+            <dt class="text-gray-500">{{ label("denom") }}</dt>
+            <dd class="mt-1 break-words font-medium">{{ params?.denom ?? "-" }}</dd>
           </div>
-          <div>
-            <dt class="text-gray-500">Max supply</dt>
-            <dd class="mt-1 font-medium">
+          <div class="min-w-0">
+            <dt class="text-gray-500">{{ label("maxSupply") }}</dt>
+            <dd class="mt-1 break-words font-medium">
               {{ formatDenomAmount(params?.max_supply ?? "0", "uferac") }} FERAC
             </dd>
           </div>
-          <div>
-            <dt class="text-gray-500">Network fee</dt>
-            <dd class="mt-1 font-medium">{{ params?.network_fee_rate ?? "-" }}</dd>
+          <div class="min-w-0">
+            <dt class="text-gray-500">{{ label("networkFee") }}</dt>
+            <dd class="mt-1 break-words font-medium">{{ params?.network_fee_rate ?? "-" }}</dd>
           </div>
-          <div>
-            <dt class="text-gray-500">Validator share</dt>
-            <dd class="mt-1 font-medium">{{ params?.network_fee_validator_share ?? "-" }}</dd>
+          <div class="min-w-0">
+            <dt class="text-gray-500">{{ label("validatorShare") }}</dt>
+            <dd class="mt-1 break-words font-medium">{{ params?.network_fee_validator_share ?? "-" }}</dd>
           </div>
-          <div>
-            <dt class="text-gray-500">Genesis validators</dt>
-            <dd class="mt-1 font-medium">{{ params?.genesis_validator_count ?? "-" }}</dd>
+          <div class="min-w-0">
+            <dt class="text-gray-500">{{ label("genesisValidators") }}</dt>
+            <dd class="mt-1 break-words font-medium">{{ params?.genesis_validator_count ?? "-" }}</dd>
           </div>
-          <div>
-            <dt class="text-gray-500">Finality threshold</dt>
-            <dd class="mt-1 font-medium">{{ params?.genesis_finality_threshold ?? "-" }}</dd>
+          <div class="min-w-0">
+            <dt class="text-gray-500">{{ label("finalityThreshold") }}</dt>
+            <dd class="mt-1 break-words font-medium">{{ params?.genesis_finality_threshold ?? "-" }}</dd>
           </div>
         </dl>
       </section>
 
       <section class="rounded-xl bg-gray-50 p-6">
-        <h2 class="mb-5 text-xl font-semibold">Validator reserve</h2>
-        <dl class="grid grid-cols-2 gap-x-6 gap-y-4 text-sm">
-          <div>
-            <dt class="text-gray-500">Remaining</dt>
-            <dd class="mt-1 font-medium">
+        <h2 class="mb-5 text-xl font-semibold">{{ label("validatorReserve") }}</h2>
+        <dl class="grid grid-cols-1 gap-y-4 text-sm sm:grid-cols-2 sm:gap-x-6">
+          <div class="min-w-0">
+            <dt class="text-gray-500">{{ label("remaining") }}</dt>
+            <dd class="mt-1 break-words font-medium">
               {{ formatDenomAmount(reserve?.remaining ?? "0", "uferac") }} FERAC
             </dd>
           </div>
-          <div>
-            <dt class="text-gray-500">Next release</dt>
-            <dd class="mt-1 font-medium">
+          <div class="min-w-0">
+            <dt class="text-gray-500">{{ label("nextRelease") }}</dt>
+            <dd class="mt-1 break-words font-medium">
               {{ formatDenomAmount(reserveData?.next_release ?? "0", "uferac") }} FERAC
             </dd>
           </div>
-          <div>
-            <dt class="text-gray-500">Epoch</dt>
-            <dd class="mt-1 font-medium">{{ reserve?.epoch ?? "-" }}</dd>
+          <div class="min-w-0">
+            <dt class="text-gray-500">{{ label("epoch") }}</dt>
+            <dd class="mt-1 break-words font-medium">{{ reserve?.epoch ?? "-" }}</dd>
           </div>
-          <div>
-            <dt class="text-gray-500">Last epoch</dt>
-            <dd class="mt-1 font-medium">{{ reserve?.last_epoch_time ?? "-" }}</dd>
+          <div class="min-w-0">
+            <dt class="text-gray-500">{{ label("lastEpoch") }}</dt>
+            <dd class="mt-1 break-words font-medium">{{ reserve?.last_epoch_time ?? "-" }}</dd>
           </div>
         </dl>
       </section>
     </div>
 
     <section class="mt-6 overflow-hidden rounded-xl bg-gray-50 p-6">
-      <h2 class="mb-5 text-xl font-semibold">Restricted accounts</h2>
+      <h2 class="mb-5 text-xl font-semibold">{{ label("restrictedAccounts") }}</h2>
       <div class="overflow-x-auto">
         <table class="w-full min-w-[680px] text-left text-sm">
           <thead class="border-b border-gray-200 text-gray-500">
             <tr>
-              <th class="pb-3 pr-4 font-normal">Address</th>
-              <th class="pb-3 pr-4 font-normal">Category</th>
-              <th class="pb-3 pr-4 text-right font-normal">Remaining</th>
-              <th class="pb-3 text-right font-normal">Released</th>
+              <th class="pb-3 pr-4 font-normal">{{ label("address") }}</th>
+              <th class="pb-3 pr-4 font-normal">{{ label("category") }}</th>
+              <th class="pb-3 pr-4 text-right font-normal">{{ label("remaining") }}</th>
+              <th class="pb-3 text-right font-normal">{{ label("released") }}</th>
             </tr>
           </thead>
           <tbody>
@@ -96,7 +96,7 @@
             </tr>
             <tr v-if="!accounts.length">
               <td colspan="4" class="py-8 text-center text-gray-500">
-                No restricted accounts
+                {{ label("noRestrictedAccounts") }}
               </td>
             </tr>
           </tbody>
@@ -105,16 +105,16 @@
     </section>
 
     <section class="mt-6 overflow-hidden rounded-xl bg-gray-50 p-6">
-      <h2 class="mb-5 text-xl font-semibold">Validator commissions</h2>
+      <h2 class="mb-5 text-xl font-semibold">{{ label("validatorCommissions") }}</h2>
       <div class="overflow-x-auto">
         <table class="w-full min-w-[760px] text-left text-sm">
           <thead class="border-b border-gray-200 text-gray-500">
             <tr>
-              <th class="pb-3 pr-4 font-normal">Validator</th>
-              <th class="pb-3 pr-4 font-normal">Operator address</th>
-              <th class="pb-3 pr-4 text-right font-normal">Commission</th>
-              <th class="pb-3 pr-4 text-right font-normal">Outstanding rewards</th>
-              <th class="pb-3 text-right font-normal">Total visible rewards</th>
+              <th class="pb-3 pr-4 font-normal">{{ label("validator") }}</th>
+              <th class="pb-3 pr-4 font-normal">{{ label("operatorAddress") }}</th>
+              <th class="pb-3 pr-4 text-right font-normal">{{ label("commission") }}</th>
+              <th class="pb-3 pr-4 text-right font-normal">{{ label("outstandingRewards") }}</th>
+              <th class="pb-3 text-right font-normal">{{ label("totalVisibleRewards") }}</th>
             </tr>
           </thead>
           <tbody>
@@ -137,7 +137,7 @@
             </tr>
             <tr v-if="!validatorCommissions.length">
               <td colspan="5" class="py-8 text-center text-gray-500">
-                No validator commissions
+                {{ label("noValidatorCommissions") }}
               </td>
             </tr>
           </tbody>
@@ -153,9 +153,12 @@ import { useQuery } from "@tanstack/vue-query";
 import { useClient } from "@/composables/useClient";
 import useFeracFeracV1 from "@/composables/useFeracFeracV1";
 import { formatDenomAmount } from "@/def-composables/useDenom";
+import { useLanguage } from "@/def-composables/useLanguage";
 
 const { QueryParams, QueryValidatorReserve, QueryRestrictedAccounts } =
   useFeracFeracV1();
+const { t } = useLanguage();
+const label = (key: Parameters<typeof t>[0]) => t(key).value;
 const paramsQuery = QueryParams({});
 const reserveQuery = QueryValidatorReserve({});
 const accountsQuery = QueryRestrictedAccounts({} as never, {}, 100);

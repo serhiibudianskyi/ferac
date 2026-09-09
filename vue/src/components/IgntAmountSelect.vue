@@ -4,7 +4,7 @@
       v-for="(x, i) in selected"
       :key="`${x.denom}-${i}`"
       :amount="x"
-      class="flex justify-between items-center my-1 py-3 rounded-xl relative px-4"
+      class="flex justify-between items-center my-1 py-2 md:py-3 rounded-xl relative px-4"
       @change="
         (val) => {
           handleInputChange({ amount: val, denom: x.denom });
@@ -22,13 +22,13 @@
       "
     >
       <IgntAddIcon class="text-black text-xl" />
-      <div class="ml-3 mt-0.5">Add asset</div>
+      <div class="ml-3 mt-0.5">{{ label("addAsset") }}</div>
     </div>
 
     <IgntModal
       :visible="state.modalOpen"
       :close-icon="true"
-      :title="'Select asset'"
+      :title="label('selectAsset')"
       @close="
         () => {
           state.modalOpen = false;
@@ -43,7 +43,7 @@
           <input
             v-model="state.tokenSearch"
             class="-ml-8 pl-10 pr-10 leading-12 h-12 appearance-none w-full outline-none border-none rounded-xl focus:shadow-outline"
-            placeholder="Search assets"
+            :placeholder="label('searchAssets')"
           />
           <div
             v-if="state.tokenSearch"
@@ -95,9 +95,13 @@ import { IgntClearIcon } from "@ignt/vue-library";
 import { computed, type PropType, reactive } from "vue";
 
 import { formatDenomAmount, useDenom } from "@/def-composables/useDenom";
+import { useLanguage } from "@/def-composables/useLanguage";
 import type { Amount } from "@/utils/interfaces";
 
 import IgntAmountInputRow from "./IgntAmountInputRow.vue";
+
+const { t } = useLanguage();
+const label = (key: Parameters<typeof t>[0]) => t(key).value;
 import IgntDenom from "./IgntDenom.vue";
 
 export interface State {

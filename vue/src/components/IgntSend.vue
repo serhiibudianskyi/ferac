@@ -1,7 +1,7 @@
 <template>
   <div>
-    <div class="pt-8">
-      <div class="text-xs text-gray-600">Send to</div>
+    <div class="pt-4 md:pt-8">
+      <div class="text-xs text-gray-600">{{ label("sendTo") }}</div>
 
       <div>
         <input
@@ -11,7 +11,7 @@
             'border border-red-400':
               state.tx.receiver.length > 0 && !validReceiver,
           }"
-          placeholder="Recipient address"
+          :placeholder="label('recipientAddress')"
         />
         <div
           v-if="state.tx.receiver.length > 0 && !validReceiver"
@@ -29,12 +29,12 @@
         @update="handleTxAmountUpdate"
       />
       <div class="px-4 text-xs text-gray-500">
-        Estimated fee: {{ formatDenomAmount(estimatedFee, "uferac") }} FERAC
+        {{ label("estimatedFee") }}: {{ formatDenomAmount(estimatedFee, "uferac") }} FERAC
       </div>
     </div>
 
     <div
-      class="flex text-xs font-semibold items-center mt-8"
+      class="flex text-xs font-semibold items-center mt-4 md:mt-8"
       :class="[
         {
           'cursor-pointer': hasAnyBalance,
@@ -48,7 +48,7 @@
         }
       "
     >
-      Advanced
+      {{ label("advanced") }}
       <template v-if="hasAnyBalance">
         <IgntChevronDownIcon
           :class="{ 'rotate-180': state.advancedOpen }"
@@ -59,11 +59,11 @@
 
     <div
       v-if="state.advancedOpen && hasAnyBalance"
-      style="width: 100%; height: 24px"
+      class="h-3 w-full md:h-6"
     />
 
     <div v-if="state.advancedOpen && hasAnyBalance" class="advanced">
-      <div class="text-xs pb-2">Fees</div>
+      <div class="text-xs pb-2">{{ label("fees") }}</div>
 
       <IgntAmountSelect
         class="token-selector"
@@ -72,28 +72,28 @@
         @update="handleTxFeesUpdate"
       />
 
-      <div class="text-xs mt-8 text-gray-600">Reference (memo)</div>
+      <div class="text-xs mt-8 text-gray-600">{{ label("reference") }}</div>
 
       <div class="mb-4">
         <input
           v-model="state.tx.memo"
           class="mt-1 py-2 px-4 h-12 bg-gray-100 border-xs text-base leading-tight w-full rounded-xl outline-0"
-          placeholder="Enter a reference"
+          :placeholder="label('enterReference')"
         />
       </div>
 
-      <div class="text-xs text-gray-600">Channel</div>
+      <div class="text-xs text-gray-600">{{ label("channel") }}</div>
 
       <div class="input-wrapper">
         <input
           v-model="state.tx.ch"
           class="mt-1 py-2 px-4 h-12 bg-gray-100 border-xs text-base leading-tight w-full rounded-xl outline-0"
-          placeholder="Enter a channel"
+          :placeholder="label('enterChannel')"
         />
       </div>
     </div>
 
-    <div style="width: 100%; height: 24px" />
+    <div class="h-3 w-full md:h-6" />
 
     <div>
       <IgntButton
@@ -101,7 +101,7 @@
         :disabled="!ableToTx"
         @click="sendTx"
         :busy="isTxOngoing"
-        >Send</IgntButton
+        >{{ label("send") }}</IgntButton
       >
       <div
         v-if="isTxError"
@@ -114,7 +114,7 @@
         v-if="isTxSuccess"
         class="flex items-center justify-center text-xs text-green-500 italic mt-2"
       >
-        Tx submitted succesfully
+        {{ label("success") }}
       </div>
     </div>
   </div>
@@ -132,6 +132,7 @@ import { useClient } from "@/composables/useClient";
 import { useAddress } from "@/def-composables/useAddress";
 import { useAssets } from "@/def-composables/useAssets";
 import { formatDenomAmount } from "@/def-composables/useDenom";
+import { useLanguage } from "@/def-composables/useLanguage";
 import type { Amount } from "@/utils/interfaces";
 import { env } from "@/env";
 
@@ -183,6 +184,8 @@ const client = useClient();
 const queryClient = useQueryClient();
 const { address } = useAddress();
 const { balances } = useAssets(100);
+const { t } = useLanguage();
+const label = (key: Parameters<typeof t>[0]) => t(key).value;
 
 const getBlockHeight = async (): Promise<number> => {
   const response = await fetch(`${env.rpcURL}status`);

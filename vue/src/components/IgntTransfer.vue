@@ -1,6 +1,7 @@
 <template>
   <div class="transfer-panel min-w-0">
   <IgntTabs
+    :key="locale"
     :tabHeaderClasses="[
       'text-3xl',
       'font-semibold',
@@ -13,10 +14,10 @@
     :inactiveLinkClasses="['text-gray-400']"
     :activeLinkClasses="['text-black']"
   >
-    <div class="" tabTitle="Send">
+    <div class="" :tabTitle="label('send')">
       <IgntSend v-if="address" />
     </div>
-    <div class="" tabTitle="Receive">
+    <div class="" :tabTitle="label('receive')">
       <IgntCard v-if="address">
         <template #header>
           <div
@@ -45,8 +46,11 @@ import { IgntCard } from "@ignt/vue-library";
 import { IgntClipboard } from "@ignt/vue-library";
 
 import { useAddress } from "@/def-composables/useAddress";
+import { useLanguage } from "@/def-composables/useLanguage";
 
 import IgntSend from "./IgntSend.vue";
 
 const { address } = useAddress();
+const { locale, t } = useLanguage();
+const label = (key: Parameters<typeof t>[0]) => t(key).value;
 </script>

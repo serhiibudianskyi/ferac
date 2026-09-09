@@ -13,7 +13,7 @@
         }"
       >
         {{ formatDenomAmount(balance?.amount ?? "0", props.amount.denom) }}
-        available
+        {{ label("available") }}
       </div>
     </div>
 
@@ -35,6 +35,7 @@ import { computed, type PropType, ref } from "vue";
 
 import { useAsset } from "../def-composables/useAsset";
 import { formatDenomAmount } from "../def-composables/useDenom";
+import { useLanguage } from "../def-composables/useLanguage";
 import type { Amount } from "../utils/interfaces";
 import IgntDenom from "./IgntDenom.vue";
 
@@ -45,6 +46,8 @@ const props = defineProps({
   },
 });
 const { balance } = useAsset(props.amount.denom);
+const { t } = useLanguage();
+const label = (key: Parameters<typeof t>[0]) => t(key).value;
 
 const emit = defineEmits(["change"]);
 const value = ref(

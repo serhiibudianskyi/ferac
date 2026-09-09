@@ -2,7 +2,7 @@
   <section>
     <header class="flex items-center justify-between">
       <h2 class="text-3xl text-black font-semibold p-0 m-0 mb-2.5 flex-1">
-        Assets
+        {{ label("assets") }}
       </h2>
       <div
         v-if="balances.assets.length"
@@ -16,7 +16,7 @@
           v-model="searchQuery"
           type="search"
           autocomplete="off"
-          placeholder="Search assets"
+          :placeholder="label('searchAssets')"
           class="asset-search w-48 -ml-8 pl-10 pr-10 leading-12 h-12 appearance-none outline-none border-none rounded-xl focus:shadow-outline"
           @input="(evt: Event) => {
             resetDisplayLimit();
@@ -35,10 +35,10 @@
     <table class="asset-table table-auto w-full">
       <thead v-if="balances.assets.length">
         <tr>
-          <td class="text-left text-xs text-black opacity-70">Asset</td>
+          <td class="text-left text-xs text-black opacity-70">{{ label("asset") }}</td>
           <td></td>
           <td class="text-right text-xs text-black opacity-70">
-            Available balance
+            {{ label("availableBalance") }}
           </td>
         </tr>
       </thead>
@@ -74,8 +74,8 @@
             class="text-center text-black text-md font-bold py-10"
             colspan="3"
           >
-            <h4>No results for '{{ searchQuery }}'</h4>
-            <p class="text-sm font-normal">Try again with another search</p>
+            <h4>{{ label("noResultsFor") }} '{{ searchQuery }}'</h4>
+            <p class="text-sm font-normal">{{ label("tryAnotherSearch") }}</p>
           </td>
         </tr>
       </tbody>
@@ -104,14 +104,14 @@
       v-if="!address || (!balances.isLoading && !balances.assets.length)"
       class="text-left text-black opacity-75 text-md font-normal py-8"
     >
-      You have no assets
+      {{ label("noAssets") }}
     </div>
     <div
       v-if="(!balances.isLoading && hasMore) || isShowMore"
       class="shadow-std flex items-center justify-center w-40 rounded-full text-sm font-medium mx-auto inset-x-0 py-2"
       @click="onShowMore"
     >
-      Show more
+      {{ label("showMore") }}
 
       <IgntArrowIcon class="ml-2" />
     </div>
@@ -127,6 +127,7 @@ import { computed, nextTick, ref, toRefs } from "vue";
 import { useAddress } from "../def-composables/useAddress";
 import { useAssets } from "../def-composables/useAssets";
 import { formatDenomAmount, useDenom } from "../def-composables/useDenom";
+import { useLanguage } from "../def-composables/useLanguage";
 import IgntDenom from "./IgntDenom.vue";
 
 const props = defineProps({
@@ -148,6 +149,8 @@ const state = ref({
 // composables
 const { address } = useAddress();
 const { balances, fetch, hasMore } = useAssets(props.displayLimit);
+const { t } = useLanguage();
+const label = (key: Parameters<typeof t>[0]) => t(key).value;
 
 const filteredBalanceList = computed(() => {
   if (!state.value.searchQuery) {

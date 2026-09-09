@@ -16,7 +16,7 @@
 </template>
 <script setup lang="ts">
 import { IgntLink } from "@ignt/vue-library";
-import { type PropType, ref } from "vue";
+import { type PropType, computed } from "vue";
 
 import IgntAcc from "@/components/IgntAcc.vue";
 
@@ -31,5 +31,5 @@ const props = defineProps({
     required: true,
   },
 });
-const navItems = ref(props.navItems);
+const navItems = computed(() => props.navItems);
 </script>
